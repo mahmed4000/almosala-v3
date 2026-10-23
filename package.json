@@ -33,6 +33,7 @@
     "typescript": "~6.0.3"
   },
   "scripts": {
+    "postinstall": "node scripts/patch-ios.js",
     "start": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",
