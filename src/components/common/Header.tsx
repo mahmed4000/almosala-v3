@@ -29,40 +29,47 @@ export const Header: React.FC<HeaderProps> = ({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingHorizontal: 16,
-        paddingTop: Platform.OS === 'ios' ? 12 : 16,
-        paddingBottom: 14,
+        paddingHorizontal: 14,
+        paddingTop: Platform.OS === 'ios' ? 48 : (Platform.OS === 'web' ? 46 : 14),
+        paddingBottom: 12,
         backgroundColor: c.bg,
         borderBottomWidth: 1,
         borderColor: c.border
       }}
     >
-      {/* Right Edge (RTL): Back Button */}
-      <View style={{ minWidth: 42, alignItems: 'flex-start', justifyContent: 'center' }}>
+      {/* Back Button with text and icon for high visibility */}
+      <View style={{ minWidth: 70, alignItems: 'flex-start', justifyContent: 'center' }}>
         {onBack ? (
           <TouchableOpacity
             onPress={onBack}
             hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel="رجوع"
             style={{
-              width: 38,
-              height: 38,
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 5,
+              paddingHorizontal: 12,
+              paddingVertical: 6,
               borderRadius: TOKENS.radius.pill,
               backgroundColor: c.surface,
-              alignItems: 'center',
-              justifyContent: 'center',
               borderWidth: 1,
               borderColor: c.border
             }}
           >
-            <Feather name={isRTL ? "arrow-right" : "arrow-left"} size={18} color={c.textPrimary} />
+            <Feather name={isRTL ? "arrow-right" : "arrow-left"} size={16} color={TOKENS.colors.primary} />
+            <TextUI size={13} weight="bold" color={TOKENS.colors.primary}>
+              رجوع
+            </TextUI>
           </TouchableOpacity>
         ) : (
-          <View style={{ width: 38 }} />
+          <View style={{ width: 70 }} />
         )}
       </View>
 
       {/* Center: Title & Subtitle */}
-      <View style={{ flex: 1, alignItems: 'center', paddingHorizontal: 10 }}>
+      <View style={{ flex: 1, alignItems: 'center', paddingHorizontal: 8 }}>
         <TextUI size={17} weight="bold" color={c.textPrimary} numberOfLines={1}>
           {title}
         </TextUI>
@@ -73,9 +80,9 @@ export const Header: React.FC<HeaderProps> = ({
         ) : null}
       </View>
 
-      {/* Left Edge: Optional rightAction or placeholder */}
-      <View style={{ minWidth: 42, alignItems: 'flex-end', justifyContent: 'center' }}>
-        {rightAction || <View style={{ width: 38 }} />}
+      {/* Left Edge: Optional rightAction or matching placeholder for symmetry */}
+      <View style={{ minWidth: 70, alignItems: 'flex-end', justifyContent: 'center' }}>
+        {rightAction || <View style={{ width: 70 }} />}
       </View>
     </View>
   );

@@ -103,7 +103,7 @@ export const QuranIndexScreen: React.FC = () => {
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingTop: Platform.OS === 'ios' ? 44 : 10, paddingBottom: 11, backgroundColor: TOKENS.colors.primaryDark }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingTop: Platform.OS === 'ios' ? 48 : (Platform.OS === 'web' ? 46 : 14), paddingBottom: 11, backgroundColor: TOKENS.colors.primaryDark }}>
         <TouchableOpacity 
           onPress={goBack} 
           style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.18)' }}

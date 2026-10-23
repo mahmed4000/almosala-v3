@@ -763,7 +763,7 @@ export const QuranReaderScreen: React.FC = () => {
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <View style={{ minHeight: 52, paddingHorizontal: 12, paddingTop: Platform.OS === 'ios' ? 44 : 8, paddingBottom: 8, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: c.surface, borderBottomWidth: 1, borderColor: c.border }}>
+      <View style={{ minHeight: 52, paddingHorizontal: 12, paddingTop: Platform.OS === 'ios' ? 48 : (Platform.OS === 'web' ? 46 : 14), paddingBottom: 8, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: c.surface, borderBottomWidth: 1, borderColor: c.border }}>
         {/* زر رجوع واضح وكبير بالاسم والأيقونة */}
         <TouchableOpacity 
           onPress={goBack} 
