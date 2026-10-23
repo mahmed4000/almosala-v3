@@ -763,13 +763,34 @@ export const QuranReaderScreen: React.FC = () => {
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <View style={{ minHeight: 46, paddingHorizontal: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: c.surface, borderBottomWidth: 1, borderColor: c.border }}>
-        <TouchableOpacity onPress={goBack} accessibilityLabel="رجوع" style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }}><Feather name="chevron-right" size={25} color={c.textPrimary} /></TouchableOpacity>
+      <View style={{ minHeight: 52, paddingHorizontal: 12, paddingTop: Platform.OS === 'ios' ? 44 : 8, paddingBottom: 8, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: c.surface, borderBottomWidth: 1, borderColor: c.border }}>
+        {/* زر رجوع واضح وكبير بالاسم والأيقونة */}
+        <TouchableOpacity 
+          onPress={goBack} 
+          accessibilityLabel="رجوع" 
+          activeOpacity={0.7}
+          style={{ 
+            flexDirection: 'row', 
+            alignItems: 'center', 
+            gap: 5, 
+            paddingHorizontal: 12, 
+            paddingVertical: 6, 
+            borderRadius: 20, 
+            backgroundColor: c.bgSecondary,
+            borderWidth: 1,
+            borderColor: c.border
+          }}
+        >
+          <Feather name="arrow-right" size={17} color={TOKENS.colors.primary} />
+          <TextUI size={13} weight="bold" color={TOKENS.colors.primary}>رجوع</TextUI>
+        </TouchableOpacity>
+
         <TextUI size={16} weight="bold" color={c.textPrimary}>القرآن الكريم</TextUI>
-        <TouchableOpacity onPress={() => setReciterModalVisible(true)} accessibilityRole="button" accessibilityLabel={`تغيير القارئ، الحالي ${currentReciterObj.nameAr}`} style={{ minWidth: 130, maxWidth: 175, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: 5, paddingVertical: 7, paddingHorizontal: 5 }}>
-          <Feather name="mic" size={17} color={TOKENS.colors.primary} />
+
+        <TouchableOpacity onPress={() => setReciterModalVisible(true)} accessibilityRole="button" accessibilityLabel={`تغيير القارئ، الحالي ${currentReciterObj.nameAr}`} style={{ minWidth: 110, maxWidth: 175, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: 5, paddingVertical: 6, paddingHorizontal: 8, borderRadius: 20, backgroundColor: c.bgSecondary, borderWidth: 1, borderColor: c.border }}>
+          <Feather name="mic" size={15} color={TOKENS.colors.primary} />
           <TextUI size={11} weight="bold" color={c.textPrimary} numberOfLines={1}>{currentReciterObj.nameAr}</TextUI>
-          <Feather name="chevron-down" size={13} color={c.textSecondary} />
+          <Feather name="chevron-down" size={12} color={c.textSecondary} />
         </TouchableOpacity>
       </View>
 

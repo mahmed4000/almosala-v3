@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { FlatList, Modal, TextInput, TouchableOpacity, View } from 'react-native';
+import { FlatList, Modal, TextInput, TouchableOpacity, View, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useApp } from '../context/AppContext';
@@ -103,8 +103,14 @@ export const QuranIndexScreen: React.FC = () => {
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingTop: 10, paddingBottom: 11, backgroundColor: TOKENS.colors.primaryDark }}>
-        <TouchableOpacity onPress={goBack} style={{ padding: 5 }}><Feather name="chevron-right" size={25} color={c.surface} /></TouchableOpacity>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingTop: Platform.OS === 'ios' ? 44 : 10, paddingBottom: 11, backgroundColor: TOKENS.colors.primaryDark }}>
+        <TouchableOpacity 
+          onPress={goBack} 
+          style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.18)' }}
+        >
+          <Feather name="arrow-right" size={17} color={c.surface} />
+          <TextUI size={13} weight="bold" color={c.surface}>رجوع</TextUI>
+        </TouchableOpacity>
         <TextUI size={17} weight="bold" color={c.surface}>{t('القرآن', 'Quran')}</TextUI>
         <TouchableOpacity onPress={() => setReciterModalVisible(true)} style={{ flexDirection: 'row', alignItems: 'center', gap: 5, minWidth: 90, justifyContent: 'flex-end' }}><Feather name="mic" size={17} color={c.surface} /><TextUI size={11} color={c.surface} numberOfLines={1}>{selectedReciterData.nameAr}</TextUI></TouchableOpacity>
       </View>
