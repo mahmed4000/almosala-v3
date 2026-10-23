@@ -50,8 +50,12 @@ function scanAndPatch(dir) {
           content = content.replace(/weak let/g, 'weak var');
           modified = true;
         }
-        if (content.includes('weak var runtime: JavaScriptRuntime?')) {
-          content = content.replace(/weak var runtime: JavaScriptRuntime\?/g, 'nonisolated(unsafe) weak var runtime: JavaScriptRuntime?');
+        if (content.includes('nonisolated(unsafe) nonisolated(unsafe)')) {
+          content = content.replace(/(nonisolated\(unsafe\)\s*)+/g, 'nonisolated(unsafe) ');
+          modified = true;
+        }
+        if (/(?<!nonisolated\(unsafe\)\s)weak var runtime:\s*JavaScriptRuntime\?/.test(content)) {
+          content = content.replace(/(?<!nonisolated\(unsafe\)\s)weak var runtime:\s*JavaScriptRuntime\?/g, 'nonisolated(unsafe) weak var runtime: JavaScriptRuntime?');
           modified = true;
         }
         if (content.includes('consuming JavaScriptValuesBuffer,')) {
