@@ -30,7 +30,7 @@ export const Header: React.FC<HeaderProps> = ({
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingHorizontal: 14,
-        paddingTop: Platform.OS === 'ios' ? 48 : (Platform.OS === 'web' ? 46 : 14),
+        paddingTop: Platform.OS === 'ios' ? 60 : (Platform.OS === 'web' ? 46 : 14),
         paddingBottom: 12,
         backgroundColor: c.bg,
         borderBottomWidth: 1,
@@ -42,7 +42,7 @@ export const Header: React.FC<HeaderProps> = ({
         {onBack ? (
           <TouchableOpacity
             onPress={onBack}
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+            hitSlop={{ top: 14, bottom: 14, left: 14, right: 14 }}
             activeOpacity={0.7}
             accessibilityRole="button"
             accessibilityLabel="رجوع"
@@ -50,8 +50,8 @@ export const Header: React.FC<HeaderProps> = ({
               flexDirection: 'row',
               alignItems: 'center',
               gap: 5,
-              paddingHorizontal: 12,
-              paddingVertical: 6,
+              paddingHorizontal: 13,
+              paddingVertical: 7,
               borderRadius: TOKENS.radius.pill,
               backgroundColor: c.surface,
               borderWidth: 1,

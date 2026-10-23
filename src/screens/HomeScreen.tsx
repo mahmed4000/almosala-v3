@@ -46,7 +46,11 @@ export const HomeScreen: React.FC = () => {
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: c.bg }}
-      contentContainerStyle={{ padding: 18, paddingBottom: 110 }}
+      contentContainerStyle={{
+        paddingHorizontal: 18,
+        paddingTop: Platform.OS === 'ios' ? 60 : (Platform.OS === 'web' ? 46 : 18),
+        paddingBottom: 110
+      }}
       showsVerticalScrollIndicator={false}
     >
       {/* 1. Top Brand Header */}
@@ -78,6 +82,7 @@ export const HomeScreen: React.FC = () => {
             <TouchableOpacity
               activeOpacity={0.8}
               onPress={() => navigate('settings')}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               style={{
                 width: 38,
                 height: 38,

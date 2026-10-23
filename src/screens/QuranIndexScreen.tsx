@@ -103,16 +103,24 @@ export const QuranIndexScreen: React.FC = () => {
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingTop: Platform.OS === 'ios' ? 48 : (Platform.OS === 'web' ? 46 : 14), paddingBottom: 11, backgroundColor: TOKENS.colors.primaryDark }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingTop: Platform.OS === 'ios' ? 60 : (Platform.OS === 'web' ? 46 : 14), paddingBottom: 12, backgroundColor: TOKENS.colors.primaryDark }}>
         <TouchableOpacity 
           onPress={goBack} 
-          style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.18)' }}
+          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+          style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.18)' }}
         >
           <Feather name="arrow-right" size={17} color={c.surface} />
           <TextUI size={13} weight="bold" color={c.surface}>رجوع</TextUI>
         </TouchableOpacity>
         <TextUI size={17} weight="bold" color={c.surface}>{t('القرآن', 'Quran')}</TextUI>
-        <TouchableOpacity onPress={() => setReciterModalVisible(true)} style={{ flexDirection: 'row', alignItems: 'center', gap: 5, minWidth: 90, justifyContent: 'flex-end' }}><Feather name="mic" size={17} color={c.surface} /><TextUI size={11} color={c.surface} numberOfLines={1}>{selectedReciterData.nameAr}</TextUI></TouchableOpacity>
+        <TouchableOpacity 
+          onPress={() => setReciterModalVisible(true)} 
+          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+          style={{ flexDirection: 'row', alignItems: 'center', gap: 5, minWidth: 90, justifyContent: 'flex-end', paddingVertical: 4 }}
+        >
+          <Feather name="mic" size={17} color={c.surface} />
+          <TextUI size={11} color={c.surface} numberOfLines={1}>{selectedReciterData.nameAr}</TextUI>
+        </TouchableOpacity>
       </View>
       <View style={{ paddingHorizontal: 12, paddingTop: 10, paddingBottom: 4 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: c.bgSecondary, borderRadius: 28, paddingHorizontal: 14, paddingVertical: 4, borderWidth: 1, borderColor: c.border, gap: 8, marginBottom: 9 }}>
