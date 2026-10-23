@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   View,
@@ -26,7 +26,6 @@ import {
 } from '../services/quranParser';
 import {
   AVAILABLE_TAFSIR_EDITIONS,
-  TafsirEdition,
   fetchAyahTafsir,
   getSavedTafsirId,
   saveSelectedTafsirId,
@@ -54,6 +53,14 @@ const PLAYBACK_SETTINGS_KEY = 'quran.playback-settings.v1';
 const AYAH_NOTES_KEY = 'quran.ayah-notes.v1';
 const TAFSIR_FONT_SIZE_KEY = 'quran.tafsir-font-size.v1';
 type JumpType = 'page' | 'surah' | 'juz';
+
+export const SCROLL_SPEED_OPTIONS = [
+  { label: 'بطيء ١×', speed: 12 },
+  { label: 'متزن ٢×', speed: 22 },
+  { label: 'متوسط ٣×', speed: 36 },
+  { label: 'سريع ٤×', speed: 55 },
+  { label: 'فائق ٥×', speed: 80 }
+];
 
 export const QuranReaderScreen: React.FC = () => {
   const {
@@ -126,11 +133,13 @@ export const QuranReaderScreen: React.FC = () => {
   const [jumpValue, setJumpValue] = useState('');
   const [tajweedTexts, setTajweedTexts] = useState<Record<string, string>>({});
 
+  const [measuredAyahDurations, setMeasuredAyahDurations] = useState<Record<string, number>>({});
   const audioPlayerRef = useRef<any>(null);
   const webAudioRef = useRef<any>(null);
   const playbackSequenceRef = useRef<{ verses: QuranVerse[]; startIndex: number; cursor: number; repeatsLeft: number; ayahRepeatsLeft: number; settings: PlaybackSettings } | null>(null);
   const sequenceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const autoPlayHandledRef = useRef(false);
+  const lastAutoPlaySurahRef = useRef<number | null>(null);
   const scrollViewRef = useRef<ScrollView>(null);
   const scrollOffsetRef = useRef(0);
   const maxScrollRef = useRef(0);
@@ -144,8 +153,99 @@ export const QuranReaderScreen: React.FC = () => {
   const pendingScrollPageRef = useRef(initialPage);
   const paginationEndRef = useRef(renderedPages[renderedPages.length - 1] || initialPage);
   const pageAppendPendingRef = useRef(false);
-  const scrollSpeeds = [12, 22, 36, 55, 80];
   const quranTextAlign: 'center' = 'center';
+
+  const formatAudioTime = (seconds: number): string => {
+    if (!Number.isFinite(seconds) || seconds <= 0) return '٠٠:٠٠';
+    const total = Math.floor(seconds);
+    const hrs = Math.floor(total / 3600);
+    const mins = Math.floor((total % 3600) / 60);
+    const secs = total % 60;
+    const mStr = mins.toString().padStart(2, '0');
+    const sStr = secs.toString().padStart(2, '0');
+    if (hrs > 0) {
+      const hStr = hrs.toString();
+      return `${toArabicNumber(hStr)}:${toArabicNumber(mStr)}:${toArabicNumber(sStr)}`;
+    }
+    return `${toArabicNumber(mStr)}:${toArabicNumber(sStr)}`;
+  };
+
+  const getEstimatedAyahDuration = (verse: QuranVerse): number => {
+    const key = `${verse.surahId}:${verse.ayahNumber}`;
+    if (measuredAyahDurations[key] && measuredAyahDurations[key] > 0) {
+      return measuredAyahDurations[key];
+    }
+    const words = verse.text.trim().split(/\s+/).filter(Boolean).length;
+    return Math.max(3, words * 1.65);
+  };
+
+  const totalSurahVerses = parsedSurah.verses.length || currentSurah.verses || 1;
+  const currentAyahNum = (playingSurahId === currentSurah.id && playingAyahNum != null)
+    ? playingAyahNum
+    : (activeAyah && activeAyah.surahId === currentSurah.id ? activeAyah.ayahNumber : 1);
+
+  const surahTotalSeconds = useMemo(() => {
+    return parsedSurah.verses.reduce((acc, v) => acc + getEstimatedAyahDuration(v), 0) || (totalSurahVerses * 8);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [parsedSurah.verses, totalSurahVerses, measuredAyahDurations]);
+
+  const surahElapsedSeconds = useMemo(() => {
+    if (playingSurahId !== currentSurah.id && (!activeAyah || activeAyah.surahId !== currentSurah.id)) {
+      return 0;
+    }
+    let priorSec = 0;
+    for (const v of parsedSurah.verses) {
+      if (v.ayahNumber < currentAyahNum) {
+        priorSec += getEstimatedAyahDuration(v);
+      } else {
+        break;
+      }
+    }
+    const currentAyahObj = parsedSurah.verses.find((v) => v.ayahNumber === currentAyahNum) || parsedSurah.verses[0];
+    const currentAyahEstimated = getEstimatedAyahDuration(currentAyahObj);
+    const currentAyahProgress = audioDuration > 0
+      ? Math.min(audioPosition, audioDuration)
+      : Math.min(audioPosition, currentAyahEstimated);
+
+    return Math.min(surahTotalSeconds, priorSec + currentAyahProgress);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentSurah.id, playingSurahId, currentAyahNum, audioPosition, audioDuration, surahTotalSeconds, parsedSurah.verses, activeAyah, measuredAyahDurations]);
+
+  const surahRemainingSeconds = Math.max(0, surahTotalSeconds - surahElapsedSeconds);
+
+  const surahProgressRatio = surahTotalSeconds > 0
+    ? Math.min(1, Math.max(0, surahElapsedSeconds / surahTotalSeconds))
+    : 0;
+
+  const handleSurahProgressPress = (locationX: number, totalWidth: number) => {
+    if (totalWidth <= 0 || !parsedSurah.verses.length) return;
+    const ratio = Math.max(0, Math.min(1, locationX / totalWidth));
+    const targetSec = ratio * surahTotalSeconds;
+
+    let accumulated = 0;
+    let targetVerse = parsedSurah.verses[0];
+    let verseOffset = 0;
+
+    for (let i = 0; i < parsedSurah.verses.length; i++) {
+      const verse = parsedSurah.verses[i];
+      const dur = getEstimatedAyahDuration(verse);
+      if (accumulated + dur >= targetSec || i === parsedSurah.verses.length - 1) {
+        targetVerse = verse;
+        verseOffset = Math.max(0, Math.min(dur, targetSec - accumulated));
+        break;
+      }
+      accumulated += dur;
+    }
+
+    if (playingSurahId === currentSurah.id && playingAyahNum === targetVerse.ayahNumber) {
+      seekWithinAyah(verseOffset);
+    } else {
+      if (targetVerse.pageNum && targetVerse.pageNum !== activePage) {
+        goToPage(targetVerse.pageNum);
+      }
+      playAyahAudio(targetVerse);
+    }
+  };
 
   const touchDistance = (touches: any[]) => {
     if (!touches || touches.length < 2) return 0;
@@ -345,6 +445,10 @@ export const QuranReaderScreen: React.FC = () => {
     }
     const nextVerse = sequence.verses[sequence.cursor];
     if (!nextVerse) return;
+    if (nextVerse.surahId !== currentSurah.id) {
+      const nextSurahObj = QURAN_DATA.find((s) => s.id === nextVerse.surahId);
+      if (nextSurahObj) setSelectedSurah(nextSurahObj);
+    }
     if (sequence.settings.pauseSeconds > 0) {
       setPlayingAyahNum(null);
       sequenceTimerRef.current = setTimeout(() => startSequenceVerse(nextVerse), sequence.settings.pauseSeconds * 1000);
@@ -377,8 +481,13 @@ export const QuranReaderScreen: React.FC = () => {
         if (audioPlayerRef.current !== player) return;
         setIsAudioLoading(!!status?.isBuffering);
         setIsAudioPlaying(!!status?.playing);
-        setAudioPosition(Number(status?.currentTime || 0));
-        setAudioDuration(Number(status?.duration || 0));
+        const pos = Number(status?.currentTime || 0);
+        const dur = Number(status?.duration || 0);
+        setAudioPosition(pos);
+        setAudioDuration(dur);
+        if (dur > 0) {
+          setMeasuredAyahDurations((prev) => (prev[`${verse.surahId}:${verse.ayahNumber}`] === dur ? prev : { ...prev, [`${verse.surahId}:${verse.ayahNumber}`]: dur }));
+        }
         if (status?.didJustFinish) {
           player.remove();
           audioPlayerRef.current = null;
@@ -394,7 +503,16 @@ export const QuranReaderScreen: React.FC = () => {
         sound.playbackRate = sequence.settings.speed;
         webAudioRef.current = sound;
         sound.oncanplay = () => setIsAudioLoading(false);
-        sound.ontimeupdate = () => { setAudioPosition(sound.currentTime || 0); setAudioDuration(sound.duration || 0); setIsAudioPlaying(!sound.paused); };
+        sound.ontimeupdate = () => {
+          const pos = sound.currentTime || 0;
+          const dur = sound.duration || 0;
+          setAudioPosition(pos);
+          setAudioDuration(dur);
+          if (dur > 0) {
+            setMeasuredAyahDurations((prev) => (prev[`${verse.surahId}:${verse.ayahNumber}`] === dur ? prev : { ...prev, [`${verse.surahId}:${verse.ayahNumber}`]: dur }));
+          }
+          setIsAudioPlaying(!sound.paused);
+        };
         sound.onended = () => {
           if (webAudioRef.current !== sound) return;
           webAudioRef.current = null;
@@ -413,6 +531,10 @@ export const QuranReaderScreen: React.FC = () => {
   const playAyahAudio = async (verse: QuranVerse) => {
     triggerHaptic('light');
     stopAudio();
+    if (verse.surahId !== currentSurah.id) {
+      const verseSurah = QURAN_DATA.find((item) => item.id === verse.surahId);
+      if (verseSurah) setSelectedSurah(verseSurah);
+    }
     const allVerses = getAllQuranVerses();
     let scopedVerses = allVerses;
     if (playbackSettings.range === 'surah') scopedVerses = allVerses.filter((item) => item.surahId === verse.surahId);
@@ -431,18 +553,26 @@ export const QuranReaderScreen: React.FC = () => {
     startSequenceVerse(verse);
   };
 
+  // Strictly synchronize audio with currently active Surah
   useEffect(() => {
-    if (!screenParams?.autoPlay || autoPlayHandledRef.current) return;
+    if (playingSurahId !== null && playingSurahId !== currentSurah.id) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      stopAudio();
+    }
+    setActiveAyah((prev) => (prev && prev.surahId !== currentSurah.id ? null : prev));
+  }, [currentSurah.id, playingSurahId]);
+
+  useEffect(() => {
+    if (!screenParams?.autoPlay) return;
+    if (lastAutoPlaySurahRef.current === currentSurah.id) return;
+    lastAutoPlaySurahRef.current = currentSurah.id;
     const firstVerse = parseSurahVerses(currentSurah).verses[0];
     if (firstVerse) {
       autoPlayHandledRef.current = true;
-      // The user explicitly requested playback when opening this reader from the Quran index.
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       playAyahAudio(firstVerse);
     }
-    // This should run once when opening a surah from the play button in the index.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [screenParams?.autoPlay]);
+  }, [screenParams?.autoPlay, currentSurah.id]);
 
   const handleOpenAyahAction = (verse: QuranVerse) => {
     triggerHaptic('light');
@@ -727,16 +857,17 @@ export const QuranReaderScreen: React.FC = () => {
 
   const skipAyah = (direction: 1 | -1) => {
     triggerHaptic('light');
-    const allVerses = getAllQuranVerses();
-    const currentAyahNum = playingAyahNum || activeAyah?.ayahNumber || displayedVerses[0]?.ayahNumber || 1;
-    const currentSid = playingSurahId || currentSurah.id;
+    const surahVerses = parsedSurah.verses;
+    const currentAyahNumber = (playingSurahId === currentSurah.id && playingAyahNum != null)
+      ? playingAyahNum
+      : (activeAyah && activeAyah.surahId === currentSurah.id ? activeAyah.ayahNumber : surahVerses[0]?.ayahNumber || 1);
 
-    const currentIndex = allVerses.findIndex((v) => v.surahId === currentSid && v.ayahNumber === currentAyahNum);
+    const currentIndex = surahVerses.findIndex((v) => v.ayahNumber === currentAyahNumber);
     if (currentIndex < 0) return;
 
     const targetIndex = currentIndex + direction;
-    if (targetIndex >= 0 && targetIndex < allVerses.length) {
-      const targetVerse = allVerses[targetIndex];
+    if (targetIndex >= 0 && targetIndex < surahVerses.length) {
+      const targetVerse = surahVerses[targetIndex];
       if (targetVerse.pageNum && targetVerse.pageNum !== activePage) {
         goToPage(targetVerse.pageNum);
       }
@@ -753,18 +884,37 @@ export const QuranReaderScreen: React.FC = () => {
       setIsAudioPlaying(false);
       return;
     }
-    if (audioPlayerRef.current) {
-      audioPlayerRef.current.play();
-      setIsAudioPlaying(true);
-      return;
+    // Only resume existing audio if it matches the current surah
+    if (playingSurahId === currentSurah.id) {
+      if (audioPlayerRef.current) {
+        audioPlayerRef.current.play();
+        setIsAudioPlaying(true);
+        return;
+      }
+      if (webAudioRef.current) {
+        webAudioRef.current.play().catch(() => {});
+        setIsAudioPlaying(true);
+        return;
+      }
+    } else {
+      stopAudio();
     }
-    if (webAudioRef.current) {
-      webAudioRef.current.play().catch(() => {});
-      setIsAudioPlaying(true);
-      return;
+
+    // Determine target verse strictly from CURRENT SURAH
+    const surahVerses = parsedSurah.verses;
+    let targetVerse: QuranVerse | undefined;
+    if (activeAyah && activeAyah.surahId === currentSurah.id) {
+      targetVerse = activeAyah;
     }
-    const verse = activeAyah || displayedVerses[0] || pageVerses[0];
-    if (verse) playAyahAudio(verse);
+    if (!targetVerse) {
+      targetVerse = displayedVerses.find((v) => v.surahId === currentSurah.id);
+    }
+    if (!targetVerse) {
+      targetVerse = surahVerses[0];
+    }
+    if (targetVerse) {
+      playAyahAudio(targetVerse);
+    }
   };
 
   const seekWithinAyah = (seconds: number) => {
@@ -781,8 +931,9 @@ export const QuranReaderScreen: React.FC = () => {
 
   useEffect(() => {
     if (!autoScroll) return;
+    const currentSpeed = SCROLL_SPEED_OPTIONS[scrollSpeedIndex]?.speed || 22;
     const timer = setInterval(() => {
-      const next = Math.min(maxScrollRef.current, scrollOffsetRef.current + scrollSpeeds[scrollSpeedIndex] / 20);
+      const next = Math.min(maxScrollRef.current, scrollOffsetRef.current + currentSpeed / 20);
       scrollOffsetRef.current = next;
       scrollViewRef.current?.scrollTo({ y: next, animated: false });
       if (next >= maxScrollRef.current && maxScrollRef.current > 0) setAutoScroll(false);
@@ -1095,7 +1246,7 @@ export const QuranReaderScreen: React.FC = () => {
         <ScrollView
         ref={scrollViewRef}
         style={{ flex: 1 }}
-        contentContainerStyle={{ paddingHorizontal: 3, paddingTop: 0, paddingBottom: (isAudioPlaying || isAudioLoading || playingAyahNum != null || readerControlsVisible) ? 145 : 16, flexGrow: 1 }}
+        contentContainerStyle={{ paddingHorizontal: 3, paddingTop: 0, paddingBottom: (isAudioPlaying || isAudioLoading || playingAyahNum != null || readerControlsVisible || autoScroll) ? 180 : 16, flexGrow: 1 }}
         showsVerticalScrollIndicator={false}
         scrollEventThrottle={16}
         onTouchStart={handleReaderTouchStart}
@@ -1429,7 +1580,7 @@ export const QuranReaderScreen: React.FC = () => {
         </View>
       </ScrollView>
 
-      {(isAudioPlaying || isAudioLoading || playingAyahNum != null || readerControlsVisible) ? (
+      {(isAudioPlaying || isAudioLoading || playingAyahNum != null || readerControlsVisible || autoScroll) ? (
         <View
           style={{
             position: 'absolute',
@@ -1445,32 +1596,151 @@ export const QuranReaderScreen: React.FC = () => {
             ...makeShadow('0 -6px 20px rgba(0,0,0,0.12)', '#000', 0.12, 8)
           }}
         >
-          {/* 1. Interactive Audio Progress Bar */}
+          {/* A. Auto-Scroll Speed Controls Bar (Shown when autoScroll is active) */}
+          {autoScroll && (
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                backgroundColor: themeMode === 'light' ? '#F7F2EA' : '#231E18',
+                borderRadius: 12,
+                paddingHorizontal: 8,
+                paddingVertical: 6,
+                marginBottom: 8,
+                borderWidth: 1,
+                borderColor: themeMode === 'light' ? '#E8DFD3' : '#3A3228'
+              }}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+                <Feather name="chevrons-down" size={15} color={TOKENS.colors.primary} />
+                <TextUI size={11} weight="bold" color={TOKENS.colors.primary}>
+                  سرعة التمرير:
+                </TextUI>
+              </View>
+
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                {SCROLL_SPEED_OPTIONS.map((opt, idx) => {
+                  const isSelected = scrollSpeedIndex === idx;
+                  return (
+                    <TouchableOpacity
+                      key={`scroll-spd-${idx}`}
+                      onPress={() => {
+                        triggerHaptic('light');
+                        setScrollSpeedIndex(idx);
+                      }}
+                      hitSlop={{ top: 6, bottom: 6, left: 4, right: 4 }}
+                      style={{
+                        paddingHorizontal: 7,
+                        paddingVertical: 3,
+                        borderRadius: 8,
+                        backgroundColor: isSelected ? TOKENS.colors.primary : (themeMode === 'light' ? '#FFFFFF' : '#2D261E'),
+                        borderWidth: 1,
+                        borderColor: isSelected ? TOKENS.colors.primary : c.border
+                      }}
+                    >
+                      <TextUI
+                        size={10.5}
+                        weight={isSelected ? 'bold' : 'medium'}
+                        color={isSelected ? '#FFFFFF' : c.textSecondary}
+                      >
+                        {opt.label}
+                      </TextUI>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+
+              <TouchableOpacity
+                onPress={() => {
+                  triggerHaptic('light');
+                  setAutoScroll(false);
+                }}
+                hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                style={{
+                  paddingHorizontal: 7,
+                  paddingVertical: 3,
+                  borderRadius: 8,
+                  backgroundColor: themeMode === 'light' ? '#FEE2E2' : '#451A1A'
+                }}
+              >
+                <TextUI size={10.5} weight="bold" color="#DC2626">
+                  إيقاف
+                </TextUI>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {/* B. Surah Progress Header Row (Elapsed Time, Surah & Ayah Badge, Remaining Time) */}
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: 4,
+              paddingHorizontal: 2
+            }}
+          >
+            {/* Elapsed Time (الوقت الذي خلص) */}
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+              <Feather name="clock" size={11} color={TOKENS.colors.primary} />
+              <TextUI size={11} weight="bold" color={c.textPrimary}>
+                {formatAudioTime(surahElapsedSeconds)}
+              </TextUI>
+            </View>
+
+            {/* Surah & Ayah Progress Badge */}
+            <View
+              style={{
+                paddingHorizontal: 8,
+                paddingVertical: 2,
+                borderRadius: 10,
+                backgroundColor: c.bgSecondary,
+                borderWidth: 1,
+                borderColor: c.border
+              }}
+            >
+              <TextUI size={10.5} weight="bold" color={TOKENS.colors.primary}>
+                {`سورة ${currentSurah.nameAr} • الآية ${toArabicNumber(currentAyahNum)} من ${toArabicNumber(totalSurahVerses)}`}
+              </TextUI>
+            </View>
+
+            {/* Remaining Time (الوقت المتبقي) */}
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
+              <TextUI size={10.5} color={c.textSecondary}>
+                متبقي:
+              </TextUI>
+              <TextUI size={11} weight="bold" color={c.textSecondary}>
+                {`-${formatAudioTime(surahRemainingSeconds)}`}
+              </TextUI>
+            </View>
+          </View>
+
+          {/* C. Interactive Surah-Wide Progress Bar */}
           <TouchableOpacity
-            activeOpacity={1}
+            activeOpacity={0.9}
             onLayout={(event) => {
               audioProgressWidthRef.current = event.nativeEvent.layout.width;
             }}
             onPress={(event) => {
-              if (audioDuration > 0 && audioProgressWidthRef.current > 0) {
-                seekWithinAyah((audioDuration * event.nativeEvent.locationX) / audioProgressWidthRef.current);
-              }
+              handleSurahProgressPress(event.nativeEvent.locationX, audioProgressWidthRef.current);
             }}
             hitSlop={{ top: 8, bottom: 8 }}
-            style={{ height: 12, justifyContent: 'center', marginBottom: 6 }}
+            style={{ height: 14, justifyContent: 'center', marginBottom: 6 }}
           >
-            <View style={{ height: 4, borderRadius: 2, backgroundColor: c.border, overflow: 'hidden' }}>
+            <View style={{ height: 5, borderRadius: 2.5, backgroundColor: c.border, overflow: 'hidden' }}>
               <View
                 style={{
-                  height: 4,
+                  height: 5,
                   backgroundColor: TOKENS.colors.primary,
-                  width: `${audioDuration ? Math.min(100, (audioPosition / audioDuration) * 100) : 0}%`
+                  width: `${Math.min(100, Math.max(0, surahProgressRatio * 100))}%`,
+                  borderRadius: 2.5
                 }}
               />
             </View>
           </TouchableOpacity>
 
-          {/* 2. Top Meta Row: Ayah Info, Reciter, and Quick Actions */}
+          {/* D. Meta Row: Reciter Selector, Auto-scroll Toggle, Bookmark, Stop */}
           <View
             style={{
               flexDirection: 'row',
@@ -1480,55 +1750,52 @@ export const QuranReaderScreen: React.FC = () => {
               paddingHorizontal: 2
             }}
           >
-            {/* Right: Current Ayah & Reciter */}
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flex: 1 }}>
-              <View
-                style={{
-                  paddingHorizontal: 8,
-                  paddingVertical: 2,
-                  borderRadius: 12,
-                  backgroundColor: c.bgSecondary,
-                  borderWidth: 1,
-                  borderColor: c.border
-                }}
-              >
-                <TextUI size={11} weight="bold" color={TOKENS.colors.primary}>
-                  {playingAyahNum != null
-                    ? `الآية ${toArabicNumber(playingAyahNum)}`
-                    : `سورة ${currentSurah.nameAr}`}
-                </TextUI>
-              </View>
-
-              <TouchableOpacity
-                onPress={() => setReciterModalVisible(true)}
-                hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
-                style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}
-              >
-                <Feather name="mic" size={13} color={c.textSecondary} />
-                <TextUI size={11} color={c.textSecondary} numberOfLines={1}>
-                  {currentReciterObj.nameAr}
-                </TextUI>
-              </TouchableOpacity>
-            </View>
+            {/* Right: Reciter Selector */}
+            <TouchableOpacity
+              onPress={() => setReciterModalVisible(true)}
+              hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 5,
+                paddingHorizontal: 8,
+                paddingVertical: 3,
+                borderRadius: 10,
+                backgroundColor: c.bgSecondary,
+                borderWidth: 1,
+                borderColor: c.border
+              }}
+            >
+              <Feather name="mic" size={12} color={TOKENS.colors.primary} />
+              <TextUI size={11} weight="medium" color={c.textPrimary} numberOfLines={1}>
+                {currentReciterObj.nameAr}
+              </TextUI>
+              <Feather name="chevron-down" size={11} color={c.textSecondary} />
+            </TouchableOpacity>
 
             {/* Left: Auto-scroll, Bookmark, Stop */}
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
               <TouchableOpacity
-                onPress={() => setAutoScroll((on) => !on)}
+                onPress={() => {
+                  triggerHaptic('light');
+                  setAutoScroll((on) => !on);
+                }}
                 hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',
                   gap: 3,
-                  paddingHorizontal: 7,
-                  paddingVertical: 3,
+                  paddingHorizontal: 8,
+                  paddingVertical: 4,
                   borderRadius: 10,
-                  backgroundColor: autoScroll ? TOKENS.colors.primaryLight : 'transparent'
+                  backgroundColor: autoScroll ? TOKENS.colors.primaryLight : c.bgSecondary,
+                  borderWidth: 1,
+                  borderColor: autoScroll ? TOKENS.colors.primary : c.border
                 }}
               >
                 <Feather
                   name="chevrons-down"
-                  size={14}
+                  size={13}
                   color={autoScroll ? TOKENS.colors.primary : c.textSecondary}
                 />
                 <TextUI
@@ -1536,26 +1803,37 @@ export const QuranReaderScreen: React.FC = () => {
                   weight={autoScroll ? 'bold' : 'regular'}
                   color={autoScroll ? TOKENS.colors.primary : c.textSecondary}
                 >
-                  تمرير
+                  {autoScroll ? `تمرير (${SCROLL_SPEED_OPTIONS[scrollSpeedIndex]?.label || '١×'})` : 'تمرير'}
                 </TextUI>
               </TouchableOpacity>
 
               <TouchableOpacity
                 onPress={bookmarkCurrentReading}
                 hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
-                style={{ padding: 4 }}
+                style={{
+                  width: 30,
+                  height: 30,
+                  borderRadius: 15,
+                  backgroundColor: c.bgSecondary,
+                  borderWidth: 1,
+                  borderColor: c.border,
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
               >
-                <Feather name="bookmark" size={15} color={TOKENS.colors.secondary} />
+                <Feather name="bookmark" size={14} color={TOKENS.colors.secondary} />
               </TouchableOpacity>
 
               <TouchableOpacity
                 onPress={stopAudio}
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 style={{
-                  width: 26,
-                  height: 26,
-                  borderRadius: 13,
+                  width: 30,
+                  height: 30,
+                  borderRadius: 15,
                   backgroundColor: c.bgSecondary,
+                  borderWidth: 1,
+                  borderColor: c.border,
                   alignItems: 'center',
                   justifyContent: 'center'
                 }}
