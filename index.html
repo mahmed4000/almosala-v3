@@ -3334,13 +3334,13 @@
         </div>
 
         <div style="padding: 0 18px; margin-bottom: 8px;">
-          <select id="tafsirBookSelect" class="search-box tafsir-book-select" style="margin-bottom: 0;" onchange="changeTafsirBook(this.value)">
-            <option value="ar.muyassar" selected>🌟 التفسير الميسر (مجمع الملك فهد لطباعة المصحف الشريف)</option>
-            <option value="ar.jalalayn">📚 تفسير الجلالين (المحلي والسيوطي)</option>
-            <option value="ar.qurtubi">🏛️ تفسير القرطبي (الجامع لأحكام القرآن)</option>
-            <option value="ar.baghawi">🌿 تفسير البغوي (معالم التنزيل)</option>
-            <option value="ar.waseet">💡 التفسير الوسيط (د. محمد سيد طنطاوي)</option>
-            <option value="ar.miqbas">📜 تنوير المقباس من تفسير ابن عباس</option>
+            <option value="16" selected>🌟 التفسير الميسر (مجمع الملك فهد لطباعة المصحف الشريف)</option>
+            <option value="91">📖 تفسير السعدي (تيسير الكريم الرحمن)</option>
+            <option value="14">📚 تفسير ابن كثير (عمدة التفسير)</option>
+            <option value="94">🌿 تفسير البغوي (معالم التنزيل)</option>
+            <option value="90">🏛️ تفسير القرطبي (الجامع لأحكام القرآن)</option>
+            <option value="15">📜 تفسير الطبري (جامع البيان)</option>
+            <option value="93">💡 التفسير الوسيط (د. محمد سيد طنطاوي)</option>
           </select>
         </div>
 
@@ -5981,12 +5981,13 @@
     let tafsirFontSize = parseInt(localStorage.getItem('almosala_tafsir_font_size')) || 14;
 
     const TAFSIR_NAMES = {
-      'ar.muyassar': 'التفسير الميسر (مجمع الملك فهد لطباعة المصحف الشريف)',
-      'ar.jalalayn': 'تفسير الجلالين (جلال الدين المحلي وجلال الدين السيوطي)',
-      'ar.qurtubi': 'تفسير القرطبي (الجامع لأحكام القرآن)',
-      'ar.baghawi': 'تفسير البغوي (معالم التنزيل)',
-      'ar.waseet': 'التفسير الوسيط (د. محمد سيد طنطاوي)',
-      'ar.miqbas': 'تنوير المقباس من تفسير ابن عباس'
+      '16': 'التفسير الميسر (مجمع الملك فهد لطباعة المصحف الشريف)',
+      '91': 'تفسير السعدي (تيسير الكريم الرحمن في تفسير كلام المنان)',
+      '14': 'تفسير ابن كثير (تفسير القرآن العظيم)',
+      '94': 'تفسير البغوي (معالم التنزيل في تفسير القرآن)',
+      '90': 'تفسير القرطبي (الجامع لأحكام القرآن)',
+      '15': 'تفسير الطبري (جامع البيان عن تأويل آي القرآن)',
+      '93': 'التفسير الوسيط (د. محمد سيد طنطاوي)'
     };
 
     function adjustTafsirFontSize(delta) {
@@ -6187,20 +6188,26 @@
       }
 
       try {
-        const res = await fetch(`https://api.alquran.cloud/v1/ayah/${surahId}:${ayahNumber}/${edition}`);
-        if (!res.ok) throw new Error('Network error ' + res.status);
-        const json = await res.json();
-        if (json.data && json.data.text) {
-          const tafsirContent = json.data.text;
-          TAFSIR_CACHE[cacheKey] = tafsirContent;
-          try {
-            localStorage.setItem('almosala_' + cacheKey, tafsirContent);
-          } catch(e) {}
-          renderTafsirText(tafsirContent, edition, ayahNumber);
-          return;
+        const quranId = Number(edition);
+        if (!isNaN(quranId)) {
+          const res = await fetch(`https://api.quran.com/api/v4/tafsirs/${quranId}/by_ayah/${surahId}:${ayahNumber}`);
+          if (res.ok) {
+            const json = await res.json();
+            if (json.tafsir && json.tafsir.text) {
+              const div = document.createElement('div');
+              div.innerHTML = json.tafsir.text;
+              const cleanText = (div.textContent || div.innerText || '').trim();
+              if (cleanText) {
+                TAFSIR_CACHE[cacheKey] = cleanText;
+                try { localStorage.setItem('almosala_' + cacheKey, cleanText); } catch(e) {}
+                renderTafsirText(cleanText, edition, ayahNumber);
+                return;
+              }
+            }
+          }
         }
       } catch (err) {
-        console.warn('Alquran.cloud fetch failed, trying fallback...', err);
+        console.warn('Quran.com fetch failed, trying fallback...', err);
       }
 
       // Offline / General Surah Tafsir Fallback

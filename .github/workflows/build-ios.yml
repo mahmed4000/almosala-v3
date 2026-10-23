@@ -35,10 +35,12 @@ jobs:
       - name: 📦 Install dependencies
         run: npm ci || npm install --legacy-peer-deps
 
-      - name: 🔧 Patch Swift tools version in node_modules
+      - name: 🔧 Patch Swift tools and syntax for Swift 6.1 compatibility
         run: |
           find . -name "Package.swift" -exec sed -i '' 's/swift-tools-version: 6.2/swift-tools-version: 6.0/g' {} + || true
           find . -name "Package.swift" -exec sed -i '' 's/swift-tools-version:6.2/swift-tools-version:6.0/g' {} + || true
+          find . -name "*.swift" -exec sed -i '' 's/weak let/weak var/g' {} + || true
+          find . -name "JavaScriptRuntime.swift" -exec sed -i '' 's/consuming JavaScriptValuesBuffer,/consuming JavaScriptValuesBuffer/g' {} + || true
 
       - name: 📱 Prebuild iOS Project
         run: npx expo prebuild --platform ios --clean
@@ -48,10 +50,12 @@ jobs:
           cd ios
           pod install
 
-      - name: 🔧 Patch Swift tools version across workspace
+      - name: 🔧 Patch Swift tools and syntax across workspace
         run: |
           find . -name "Package.swift" -exec sed -i '' 's/swift-tools-version: 6.2/swift-tools-version: 6.0/g' {} + || true
           find . -name "Package.swift" -exec sed -i '' 's/swift-tools-version:6.2/swift-tools-version:6.0/g' {} + || true
+          find . -name "*.swift" -exec sed -i '' 's/weak let/weak var/g' {} + || true
+          find . -name "JavaScriptRuntime.swift" -exec sed -i '' 's/consuming JavaScriptValuesBuffer,/consuming JavaScriptValuesBuffer/g' {} + || true
 
       - name: 🔨 Build iOS App (Unsigned for Sideloading)
         run: |
