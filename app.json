@@ -50,7 +50,8 @@
     },
     "web": {
       "favicon": "./assets/favicon.png",
-      "bundler": "metro"
+      "bundler": "metro",
+      "baseUrl": "/almosala-v3"
     },
     "plugins": [
       [
