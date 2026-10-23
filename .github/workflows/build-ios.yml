@@ -7,26 +7,20 @@ on:
 
 jobs:
   build-ipa:
-    runs-on: macos-15
+    runs-on: macos-14
     timeout-minutes: 60
 
     steps:
       - name: ⬇️ Checkout repository
         uses: actions/checkout@v4
 
-      - name: 🍏 Select Xcode 16.2 / 16.0 (Stable)
+      - name: 🍏 Use Default Xcode
         run: |
-          if [ -d "/Applications/Xcode_16.2.app" ]; then
-            sudo xcode-select -s /Applications/Xcode_16.2.app
-          elif [ -d "/Applications/Xcode_16.1.app" ]; then
-            sudo xcode-select -s /Applications/Xcode_16.1.app
-          elif [ -d "/Applications/Xcode_16.0.app" ]; then
-            sudo xcode-select -s /Applications/Xcode_16.0.app
-          elif [ -d "/Applications/Xcode.app" ]; then
-            sudo xcode-select -s /Applications/Xcode.app
-          fi
+          sudo xcode-select -s /Applications/Xcode.app
           xcodebuild -version
           swift --version
+          sudo killall -9 com.apple.CoreSimulator.CoreSimulatorService || true
+          sudo xcodebuild -runFirstLaunch || true
 
       - name: 🟢 Setup Node.js
         uses: actions/setup-node@v4
@@ -37,14 +31,8 @@ jobs:
       - name: 📦 Install dependencies
         run: npm ci || npm install --legacy-peer-deps
 
-      - name: 🔧 Patch Swift tools and syntax for Swift compatibility
-        run: |
-          find . -name "Package.swift" -exec sed -i '' 's/swift-tools-version: 6.2/swift-tools-version: 6.0/g' {} + || true
-          find . -name "Package.swift" -exec sed -i '' 's/swift-tools-version:6.2/swift-tools-version:6.0/g' {} + || true
-          find . -name "*.swift" -exec sed -i '' 's/weak let/weak var/g' {} + || true
-          find . -name "JavaScriptRuntime.swift" -exec sed -i '' 's/consuming JavaScriptValuesBuffer,/consuming JavaScriptValuesBuffer/g' {} + || true
-          find . -name "RuntimeScheduler.h" -exec sed -i '' 's/SWIFT_RETURNS_RETAINED//g' {} + || true
-          find . -name "RuntimeScheduler.h" -exec sed -i '' 's/SWIFT_RETURNS_UNRETAINED//g' {} + || true
+      - name: 🔧 Run iOS Swift compatibility patches
+        run: node scripts/patch-ios.js
 
       - name: 📱 Prebuild iOS Project
         run: npx expo prebuild --platform ios --clean
@@ -54,14 +42,8 @@ jobs:
           cd ios
           pod install
 
-      - name: 🔧 Patch Swift tools and syntax across workspace
-        run: |
-          find . -name "Package.swift" -exec sed -i '' 's/swift-tools-version: 6.2/swift-tools-version: 6.0/g' {} + || true
-          find . -name "Package.swift" -exec sed -i '' 's/swift-tools-version:6.2/swift-tools-version:6.0/g' {} + || true
-          find . -name "*.swift" -exec sed -i '' 's/weak let/weak var/g' {} + || true
-          find . -name "JavaScriptRuntime.swift" -exec sed -i '' 's/consuming JavaScriptValuesBuffer,/consuming JavaScriptValuesBuffer/g' {} + || true
-          find . -name "RuntimeScheduler.h" -exec sed -i '' 's/SWIFT_RETURNS_RETAINED//g' {} + || true
-          find . -name "RuntimeScheduler.h" -exec sed -i '' 's/SWIFT_RETURNS_UNRETAINED//g' {} + || true
+      - name: 🔧 Re-run patches across workspace
+        run: node scripts/patch-ios.js
 
       - name: 🔨 Build iOS App (Unsigned for Sideloading)
         run: |
