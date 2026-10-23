@@ -14,11 +14,13 @@ export const toStandardNumber = (str: string): string => {
 };
 
 export const formatPrayerTime = (hours: number, minutes: number, lang: 'ar' | 'en' = 'ar'): string => {
-  const period = hours >= 12 ? (lang === 'ar' ? 'م' : 'PM') : (lang === 'ar' ? 'ص' : 'AM');
-  let h12 = hours % 12;
+  const safeH = (typeof hours === 'number' && Number.isFinite(hours)) ? Math.floor(hours) : 5;
+  const safeM = (typeof minutes === 'number' && Number.isFinite(minutes)) ? Math.floor(minutes) : 0;
+  const period = safeH >= 12 ? (lang === 'ar' ? 'م' : 'PM') : (lang === 'ar' ? 'ص' : 'AM');
+  let h12 = safeH % 12;
   if (h12 === 0) h12 = 12;
   const hStr = h12.toString().padStart(2, '0');
-  const mStr = minutes.toString().padStart(2, '0');
+  const mStr = safeM.toString().padStart(2, '0');
   if (lang === 'ar') {
     return `${toArabicNumber(hStr)}:${toArabicNumber(mStr)} ${period}`;
   }
@@ -41,11 +43,15 @@ export function calculateAccuratePrayerTimes(
   method: 'umm_al_qura' | 'egypt' | 'mwl' | 'isna' = 'umm_al_qura',
   asrMethod: 'standard' | 'hanafi' = 'standard'
 ): PrayerTimeValues {
+  const safeLat = (typeof lat === 'number' && Number.isFinite(lat) && lat !== 0) ? lat : 21.422487;
+  const safeLng = (typeof lng === 'number' && Number.isFinite(lng) && lng !== 0) ? lng : 39.826206;
+  const safeDate = (date instanceof Date && !isNaN(date.getTime())) ? date : new Date();
+
   // Try adhan library if available
   try {
     const adhan = require('adhan');
     if (adhan && adhan.Coordinates && adhan.CalculationMethod) {
-      const coordinates = new adhan.Coordinates(lat, lng);
+      const coordinates = new adhan.Coordinates(safeLat, safeLng);
       let params = adhan.CalculationMethod.UmmAlQura();
       if (method === 'egypt') params = adhan.CalculationMethod.Egyptian();
       else if (method === 'mwl') params = adhan.CalculationMethod.MuslimWorldLeague();
@@ -55,20 +61,25 @@ export function calculateAccuratePrayerTimes(
         params.madhab = adhan.Madhab.Hanafi;
       }
 
-      const pTimes = new adhan.PrayerTimes(coordinates, date, params);
+      const pTimes = new adhan.PrayerTimes(coordinates, safeDate, params);
       if (pTimes) {
-        const toObj = (d: Date) => ({
-          hours: d.getHours(),
-          minutes: d.getMinutes(),
-          timeStr: formatPrayerTime(d.getHours(), d.getMinutes())
-        });
+        const toObj = (d: any, fbH = 12, fbM = 0) => {
+          if (!d || !(d instanceof Date) || isNaN(d.getTime())) {
+            return { hours: fbH, minutes: fbM, timeStr: formatPrayerTime(fbH, fbM) };
+          }
+          return {
+            hours: d.getHours(),
+            minutes: d.getMinutes(),
+            timeStr: formatPrayerTime(d.getHours(), d.getMinutes())
+          };
+        };
         return {
-          fajr: toObj(pTimes.fajr),
-          sunrise: toObj(pTimes.sunrise),
-          dhuhr: toObj(pTimes.dhuhr),
-          asr: toObj(pTimes.asr),
-          maghrib: toObj(pTimes.maghrib),
-          isha: toObj(pTimes.isha)
+          fajr: toObj(pTimes.fajr, 5, 0),
+          sunrise: toObj(pTimes.sunrise, 6, 20),
+          dhuhr: toObj(pTimes.dhuhr, 12, 15),
+          asr: toObj(pTimes.asr, 15, 30),
+          maghrib: toObj(pTimes.maghrib, 18, 5),
+          isha: toObj(pTimes.isha, 19, 35)
         };
       }
     }
@@ -181,15 +192,15 @@ export function getNextPrayerCountdown(
     const p = prayers[i];
     const pSeconds = (p.hours * 60 + p.minutes) * 60;
     if (pSeconds > currentSeconds) {
-      const diffSecs = pSeconds - currentSeconds;
+      const diffSecs = Math.max(0, pSeconds - currentSeconds);
       const h = Math.floor(diffSecs / 3600);
       const m = Math.floor((diffSecs % 3600) / 60);
       const s = diffSecs % 60;
       const countdown = `-${toArabicNumber(h.toString().padStart(2, '0'))}:${toArabicNumber(m.toString().padStart(2, '0'))}:${toArabicNumber(s.toString().padStart(2, '0'))}`;
       
       const prevSeconds = i === 0 ? ((prayers[prayers.length - 1].hours * 60 + prayers[prayers.length - 1].minutes) * 60) - 86400 : ((prayers[i - 1].hours * 60 + prayers[i - 1].minutes) * 60);
-      const totalInterval = pSeconds - prevSeconds;
-      const elapsed = currentSeconds - prevSeconds;
+      const totalInterval = Math.max(1, pSeconds - prevSeconds);
+      const elapsed = Math.max(0, currentSeconds - prevSeconds);
       const progress = Math.min(100, Math.max(0, Math.round((elapsed / totalInterval) * 100)));
 
       return {
@@ -207,7 +218,7 @@ export function getNextPrayerCountdown(
 
   // Next prayer is Fajr tomorrow
   const fajrSecsTomorrow = (prayerTimes.fajr.hours * 60 + prayerTimes.fajr.minutes) * 60 + 86400;
-  const diffSecs = fajrSecsTomorrow - currentSeconds;
+  const diffSecs = Math.max(0, fajrSecsTomorrow - currentSeconds);
   const h = Math.floor(diffSecs / 3600);
   const m = Math.floor((diffSecs % 3600) / 60);
   const s = diffSecs % 60;

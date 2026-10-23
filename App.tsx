@@ -20,12 +20,21 @@ import { TextUI } from './src/components/common/TextUI';
 import { TOKENS } from './src/constants/tokens';
 
 // RTL & Audio Background Config
-if (Platform.OS !== 'web') {
-  try {
-    I18nManager.allowRTL(true);
-    I18nManager.forceRTL(true);
-  } catch (e) {}
+try {
+  I18nManager.allowRTL(true);
+  I18nManager.forceRTL(true);
+} catch (e) {}
 
+if (Platform.OS === 'web' && typeof document !== 'undefined') {
+  document.documentElement.setAttribute('dir', 'rtl');
+  document.documentElement.setAttribute('lang', 'ar');
+  if (document.body) {
+    document.body.setAttribute('dir', 'rtl');
+    document.body.style.direction = 'rtl';
+  }
+}
+
+if (Platform.OS !== 'web') {
   try {
     Notifications.setNotificationHandler({
       handleNotification: async () => ({
@@ -50,7 +59,7 @@ const AppContent: React.FC = () => {
   const { themeMode } = useApp();
 
   return (
-    <View style={{ flex: 1, backgroundColor: themeMode === 'light' ? '#FAF6F0' : '#1C1511' }}>
+    <View style={{ flex: 1, backgroundColor: themeMode === 'light' ? '#FAF6F0' : '#1C1511', direction: 'rtl' }}>
       <StatusBar
         barStyle={themeMode === 'light' ? 'dark-content' : 'light-content'}
         backgroundColor={themeMode === 'light' ? '#FAF6F0' : '#1C1511'}
