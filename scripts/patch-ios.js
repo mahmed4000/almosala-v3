@@ -43,19 +43,24 @@ function scanAndPatch(dir) {
           fs.writeFileSync(fullPath, content, 'utf8');
           console.log(`[patch-ios] Patched RuntimeScheduler.h: ${fullPath}`);
         }
-      } else if (name === 'JavaScriptRuntime.swift') {
-        let content = fs.readFileSync(fullPath, 'utf8');
-        if (content.includes('consuming JavaScriptValuesBuffer,')) {
-          content = content.replace(/consuming JavaScriptValuesBuffer,/g, 'consuming JavaScriptValuesBuffer');
-          fs.writeFileSync(fullPath, content, 'utf8');
-          console.log(`[patch-ios] Patched JavaScriptRuntime.swift: ${fullPath}`);
-        }
       } else if (name.endsWith('.swift')) {
         let content = fs.readFileSync(fullPath, 'utf8');
+        let modified = false;
         if (content.includes('weak let')) {
           content = content.replace(/weak let/g, 'weak var');
+          modified = true;
+        }
+        if (content.includes('weak var runtime: JavaScriptRuntime?')) {
+          content = content.replace(/weak var runtime: JavaScriptRuntime\?/g, 'nonisolated(unsafe) weak var runtime: JavaScriptRuntime?');
+          modified = true;
+        }
+        if (content.includes('consuming JavaScriptValuesBuffer,')) {
+          content = content.replace(/consuming JavaScriptValuesBuffer,/g, 'consuming JavaScriptValuesBuffer');
+          modified = true;
+        }
+        if (modified) {
           fs.writeFileSync(fullPath, content, 'utf8');
-          console.log(`[patch-ios] Patched weak let: ${fullPath}`);
+          console.log(`[patch-ios] Patched swift file: ${fullPath}`);
         }
       }
     }
