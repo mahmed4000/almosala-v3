@@ -7,21 +7,18 @@ on:
 
 jobs:
   build-ipa:
-    runs-on: macos-15
-
+    runs-on: macos-26
     timeout-minutes: 60
 
     steps:
       - name: ⬇️ Checkout repository
         uses: actions/checkout@v4
 
-      - name: 🍏 Use Default Xcode
+      - name: 🍏 Use Default Xcode 26
         run: |
           sudo xcode-select -s /Applications/Xcode.app
           xcodebuild -version
           swift --version
-          sudo killall -9 com.apple.CoreSimulator.CoreSimulatorService || true
-          sudo xcodebuild -runFirstLaunch || true
 
       - name: 🟢 Setup Node.js
         uses: actions/setup-node@v4
@@ -32,9 +29,6 @@ jobs:
       - name: 📦 Install dependencies
         run: npm ci || npm install --legacy-peer-deps
 
-      - name: 🔧 Run iOS Swift compatibility patches
-        run: node scripts/patch-ios.js
-
       - name: 📱 Prebuild iOS Project
         run: npx expo prebuild --platform ios --clean
 
@@ -42,9 +36,6 @@ jobs:
         run: |
           cd ios
           pod install
-
-      - name: 🔧 Re-run patches across workspace
-        run: node scripts/patch-ios.js
 
       - name: 🔨 Build iOS App (Unsigned for Sideloading)
         run: |
@@ -57,7 +48,6 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
-            SWIFT_STRICT_CONCURRENCY=minimal \
             build
 
       - name: 📦 Package .app into .ipa for Sideloadly
