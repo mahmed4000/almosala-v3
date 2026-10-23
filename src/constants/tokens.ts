@@ -39,6 +39,9 @@ export const TOKENS = {
       bgSecondary: '#F2EAE0',
       surface: '#FFFFFF',        // Pure Surface
       surfaceElevated: '#FFFFFF',
+      tafsirCardBg: '#F5ECE1',   // Soft Creamy Sandstone for Tafsir Cards
+      tafsirBorder: '#E8DFD5',
+      quranInk: '#261912',       // Deep Andalusian Ink for Quranic Text
       textPrimary: '#2D1E16',    // Deep Andalusian Espresso / حبر عربي عميق
       textSecondary: '#7D6858',  // Warm Earth Taupe
       border: '#E8DFD5',
@@ -49,6 +52,9 @@ export const TOKENS = {
       bgSecondary: '#221B17',
       surface: '#2C231E',        // Dark Sandalwood Surface
       surfaceElevated: '#382E28',
+      tafsirCardBg: '#251C17',   // Dark Espresso Surface for Tafsir Cards
+      tafsirBorder: '#3D2F26',
+      quranInk: '#F5EDE4',       // Warm Cream Ink for Quranic Text
       textPrimary: '#F5EDE4',
       textSecondary: '#B5A394',
       border: '#44352D',
