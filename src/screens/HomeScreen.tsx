@@ -1,10 +1,11 @@
 import React from 'react';
-import { View, ScrollView, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import { View, ScrollView, TouchableOpacity, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useApp } from '../context/AppContext';
 import { TextUI } from '../components/common/TextUI';
 import { MoorishArchFrame } from '../components/common/MoorishArchFrame';
 import { TOKENS, makeShadow } from '../constants/tokens';
+import { getFullDateInfo } from '../services/hijriDate';
 
 export const HomeScreen: React.FC = () => {
   const {
@@ -18,11 +19,11 @@ export const HomeScreen: React.FC = () => {
     prayerBells,
     togglePrayerBell,
     readingBookmark,
-    triggerHaptic,
     refreshLocation
   } = useApp();
 
   const c = theme;
+  const dateInfo = getFullDateInfo();
 
   const prayersList = [
     { key: 'fajr' as const, nameAr: 'الفجر', nameEn: 'Fajr', time: prayerTimes.fajr.timeStr, icon: 'sunrise' as const },
@@ -128,68 +129,139 @@ export const HomeScreen: React.FC = () => {
         activeOpacity={0.92}
         onPress={() => navigate('prayer_times')}
         style={{
-          borderRadius: 20,
-          padding: 20,
+          borderRadius: 24,
+          padding: 22,
           backgroundColor: TOKENS.colors.primaryDark,
-          marginBottom: 18,
+          marginBottom: 14,
           ...makeShadow('0 8px 24px rgba(93, 58, 34, 0.28)', TOKENS.colors.primaryDark, 0.25, 8)
         }}
       >
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <View>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-              <Feather name="clock" size={14} color={TOKENS.colors.secondary} />
-              <TextUI size={13} weight="medium" color={TOKENS.colors.secondaryLight}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+              <Feather name="clock" size={16} color={TOKENS.colors.secondary} />
+              <TextUI size={15} weight="bold" color={TOKENS.colors.secondaryLight}>
                 {t('الصلاة القادمة', 'Next Prayer')}
               </TextUI>
             </View>
-            <TextUI size={32} weight="bold" color="#FFFFFF">
+            <TextUI size={42} weight="bold" color="#FFFFFF">
               {nextPrayerInfo.nameAr}
             </TextUI>
           </View>
 
           <View style={{ alignItems: 'flex-end' }}>
-            <TextUI size={13} color={TOKENS.colors.secondaryLight} style={{ marginBottom: 4 }}>
+            <TextUI size={15} weight="bold" color={TOKENS.colors.secondaryLight} style={{ marginBottom: 6 }}>
               {t('موعد الأذان', 'Adhan Time')}
             </TextUI>
-            <TextUI size={22} weight="bold" color="#FFFFFF">
+            <TextUI size={30} weight="bold" color="#FFFFFF">
               {nextPrayerInfo.time}
             </TextUI>
           </View>
         </View>
 
         {/* Countdown Bar */}
-        <View style={{ marginTop: 16 }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-            <TextUI size={12} color={TOKENS.colors.secondaryLight}>
+        <View style={{ marginTop: 18 }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+            <TextUI size={14.5} weight="bold" color={TOKENS.colors.secondaryLight}>
               {t('الوقت المتبقي', 'Time Remaining')}
             </TextUI>
-            <TextUI size={16} weight="bold" color={TOKENS.colors.secondary}>
+            <TextUI size={22} weight="bold" color={TOKENS.colors.secondary}>
               {nextPrayerInfo.countdownText}
             </TextUI>
           </View>
 
-          <View style={{ height: 6, width: '100%', backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 3, overflow: 'hidden' }}>
+          <View style={{ height: 8, width: '100%', backgroundColor: 'rgba(255,255,255,0.18)', borderRadius: 4, overflow: 'hidden' }}>
             <View
               style={{
                 height: '100%',
                 width: `${nextPrayerInfo.progress}%`,
                 backgroundColor: TOKENS.colors.secondary,
-                borderRadius: 3
+                borderRadius: 4
               }}
             />
           </View>
         </View>
       </TouchableOpacity>
 
+      {/* 2.5 Hijri & Gregorian Dates Card Under The Next Prayer Hero */}
+      <View
+        style={{
+          backgroundColor: c.surface,
+          borderRadius: 18,
+          paddingVertical: 14,
+          paddingHorizontal: 16,
+          marginBottom: 18,
+          borderWidth: 1,
+          borderColor: c.border,
+          ...makeShadow('0 4px 16px rgba(0,0,0,0.06)', '#000', 0.06, 6)
+        }}
+      >
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          {/* Hijri Date Section */}
+          <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            <View
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: 22,
+                backgroundColor: themeMode === 'light' ? '#FFF5EA' : '#33271C',
+                borderWidth: 1,
+                borderColor: TOKENS.colors.secondary,
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              <Feather name="moon" size={20} color={TOKENS.colors.secondary} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <TextUI size={12.5} weight="bold" color={TOKENS.colors.primary} style={{ marginBottom: 2 }}>
+                {t('التاريخ الهجري', 'Hijri')}
+              </TextUI>
+              <TextUI size={16.5} weight="bold" color={c.textPrimary} numberOfLines={1}>
+                {dateInfo.hijriFormatted}
+              </TextUI>
+            </View>
+          </View>
+
+          {/* Divider */}
+          <View style={{ width: 1, height: 38, backgroundColor: c.border, marginHorizontal: 10 }} />
+
+          {/* Gregorian Date Section */}
+          <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            <View
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: 22,
+                backgroundColor: themeMode === 'light' ? '#F0F5F2' : '#1E2D24',
+                borderWidth: 1,
+                borderColor: themeMode === 'light' ? '#B8D5C4' : '#2A4535',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              <Feather name="calendar" size={20} color={themeMode === 'light' ? '#2D6A4F' : '#52B788'} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <TextUI size={12.5} weight="bold" color={themeMode === 'light' ? '#2D6A4F' : '#52B788'} style={{ marginBottom: 2 }}>
+                {t('التاريخ الميلادي', 'Gregorian')}
+              </TextUI>
+              <TextUI size={15.5} weight="bold" color={c.textPrimary} numberOfLines={1}>
+                {dateInfo.gregorianFormatted}
+              </TextUI>
+            </View>
+          </View>
+        </View>
+      </View>
+
       {/* 3. Daily 5 Prayers Horizontal Card Grid */}
       <View style={{ marginBottom: 20 }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-          <TextUI size={16} weight="bold" color={c.textPrimary}>
+          <TextUI size={17} weight="bold" color={c.textPrimary}>
             {t('مواقيت الصلاة اليوم', "Today's Prayer Schedule")}
           </TextUI>
           <TouchableOpacity onPress={() => navigate('prayer_times')}>
-            <TextUI size={13} weight="medium" color={TOKENS.colors.primary}>
+            <TextUI size={14} weight="bold" color={TOKENS.colors.primary}>
               {t('عرض الكل', 'View All')}
             </TextUI>
           </TouchableOpacity>
@@ -213,11 +285,11 @@ export const HomeScreen: React.FC = () => {
                   borderColor: isNext ? TOKENS.colors.primary : c.border
                 }}
               >
-                <Feather name={p.icon} size={16} color={isNext ? TOKENS.colors.primaryDark : c.textSecondary} />
-                <TextUI size={12} weight={isNext ? 'bold' : 'medium'} color={isNext ? TOKENS.colors.primaryDark : c.textPrimary} style={{ marginTop: 4 }}>
+                <Feather name={p.icon} size={18} color={isNext ? TOKENS.colors.primaryDark : c.textSecondary} />
+                <TextUI size={13.5} weight={isNext ? 'bold' : 'medium'} color={isNext ? TOKENS.colors.primaryDark : c.textPrimary} style={{ marginTop: 4 }}>
                   {p.nameAr}
                 </TextUI>
-                <TextUI size={11} color={c.textSecondary} style={{ marginTop: 2 }}>
+                <TextUI size={13} weight="bold" color={isNext ? TOKENS.colors.primaryDark : c.textSecondary} style={{ marginTop: 2 }}>
                   {p.time.split(' ')[0]}
                 </TextUI>
 
@@ -228,7 +300,7 @@ export const HomeScreen: React.FC = () => {
                 >
                   <Feather
                     name={hasBell ? 'bell' : 'bell-off'}
-                    size={13}
+                    size={14}
                     color={hasBell ? TOKENS.colors.secondary : c.textSecondary}
                   />
                 </TouchableOpacity>
