@@ -961,11 +961,11 @@ export const QuranReaderScreen: React.FC = () => {
   };
 
   const renderAyahMarker = (arabicNumber: string, isPlaying: boolean = false, verse?: QuranVerse) => {
-    const badgeSize = Math.max(26, Math.round(quranFontSize * 1.15));
-    const rosetteSize = Math.round(badgeSize * 1.16);
+    const badgeSize = Math.max(28, Math.round(quranFontSize * 1.2));
+    const rosetteSize = Math.round(badgeSize * 1.15);
     const numSize = arabicNumber.length > 2
-      ? Math.max(8, Math.round(badgeSize * 0.32))
-      : Math.max(9.5, Math.round(badgeSize * 0.40));
+      ? Math.max(8.5, Math.round(badgeSize * 0.34))
+      : Math.max(10.5, Math.round(badgeSize * 0.44));
 
     return (
       <View
@@ -973,6 +973,8 @@ export const QuranReaderScreen: React.FC = () => {
         style={{
           width: badgeSize,
           height: badgeSize,
+          alignItems: 'center',
+          justifyContent: 'center',
           marginHorizontal: 3,
           position: 'relative',
         }}
@@ -980,13 +982,8 @@ export const QuranReaderScreen: React.FC = () => {
         <Text
           style={{
             position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
             fontFamily: 'Amiri_400Regular',
             fontSize: rosetteSize,
-            lineHeight: badgeSize,
             color: isPlaying ? TOKENS.colors.primaryDark : TOKENS.colors.primary,
             textAlign: 'center',
             includeFontPadding: false,
@@ -994,24 +991,30 @@ export const QuranReaderScreen: React.FC = () => {
         >
           ۝
         </Text>
-        <Text
+        <View
           style={{
             position: 'absolute',
             top: 0,
             left: 0,
             right: 0,
             bottom: 0,
-            fontFamily: 'Tajawal_700Bold',
-            fontSize: numSize,
-            lineHeight: badgeSize,
-            color: isPlaying ? TOKENS.colors.primaryDark : c.textPrimary,
-            textAlign: 'center',
-            includeFontPadding: false,
-            paddingTop: Platform.OS === 'ios' ? 1.5 : 0,
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingTop: Platform.OS === 'ios' ? 3.5 : 3,
           }}
         >
-          {arabicNumber}
-        </Text>
+          <Text
+            style={{
+              fontFamily: 'Amiri_700Bold',
+              fontSize: numSize,
+              color: isPlaying ? TOKENS.colors.primaryDark : c.textPrimary,
+              textAlign: 'center',
+              includeFontPadding: false,
+            }}
+          >
+            {arabicNumber}
+          </Text>
+        </View>
       </View>
     );
   };

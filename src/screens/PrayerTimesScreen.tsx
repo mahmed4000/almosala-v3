@@ -160,7 +160,7 @@ export const PrayerTimesScreen: React.FC = () => {
                   </View>
 
                   <View>
-                    <TextUI variant="h4" color={c.textPrimary}>
+                    <TextUI cairo size={14} weight="bold" color={c.textPrimary}>
                       {p.nameAr}
                     </TextUI>
                     <TextUI variant="caption" color={c.textSecondary}>

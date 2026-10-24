@@ -144,7 +144,7 @@ export const HomeScreen: React.FC = () => {
                 {t('الصلاة القادمة', 'Next Prayer')}
               </TextUI>
             </View>
-            <TextUI variant="h1" color="#FFFFFF">
+            <TextUI cairo size={24} weight="bold" color="#FFFFFF">
               {nextPrayerInfo.nameAr}
             </TextUI>
           </View>
@@ -335,8 +335,9 @@ export const HomeScreen: React.FC = () => {
 
                 {/* Prayer Name */}
                 <TextUI
-                  variant="caption"
-                  weight="medium"
+                  cairo
+                  size={14}
+                  weight="bold"
                   color={isNext ? TOKENS.colors.primaryDark : c.textPrimary}
                   style={{ marginBottom: 2 }}
                   numberOfLines={1}

@@ -26,6 +26,8 @@ interface TextUIProps {
   color?: string;
   align?: 'left' | 'right' | 'center' | 'justify';
   quran?: boolean;
+  cairo?: boolean;
+  font?: 'tajawal' | 'amiri' | 'cairo';
   numberOfLines?: number;
   onPress?: (event?: any) => void;
   fontsLoaded?: boolean;
@@ -41,6 +43,8 @@ export const TextUI: React.FC<TextUIProps> = ({
   color,
   align,
   quran,
+  cairo,
+  font,
   numberOfLines,
   onPress,
   fontsLoaded = true,
@@ -49,17 +53,36 @@ export const TextUI: React.FC<TextUIProps> = ({
   const variantToken = variant ? TOKENS.typography[variant] : null;
   const resolvedSize = size ?? variantToken?.fontSize ?? 14;
   const resolvedWeight = weight ?? variantToken?.weight ?? 'regular';
-  const resolvedQuran = quran ?? (variantToken as any)?.quran ?? false;
+  const isCairo = cairo || font === 'cairo';
+  const isQuran = quran || font === 'amiri' || (variantToken as any)?.quran;
 
   let fontFamily: string | undefined = undefined;
   let fontWeight: any = resolvedWeight === 'bold' ? '700' : resolvedWeight === 'medium' ? '500' : '400';
 
   if (Platform.OS === 'web') {
-    fontFamily = resolvedQuran ? 'Amiri, serif' : 'Tajawal, "Noto Sans Arabic", -apple-system, sans-serif';
+    if (isCairo) {
+      fontFamily = resolvedWeight === 'bold'
+        ? 'Cairo_700Bold, Cairo, sans-serif'
+        : resolvedWeight === 'medium'
+        ? 'Cairo_600SemiBold, Cairo, sans-serif'
+        : 'Cairo_400Regular, Cairo, sans-serif';
+    } else if (isQuran) {
+      fontFamily = resolvedWeight === 'bold' ? 'Amiri_700Bold, Amiri, serif' : 'Amiri_400Regular, Amiri, serif';
+    } else {
+      fontFamily = resolvedWeight === 'bold'
+        ? 'Tajawal_700Bold, Tajawal, "Noto Sans Arabic", -apple-system, sans-serif'
+        : resolvedWeight === 'medium'
+        ? 'Tajawal_500Medium, Tajawal, "Noto Sans Arabic", -apple-system, sans-serif'
+        : 'Tajawal_400Regular, Tajawal, "Noto Sans Arabic", -apple-system, sans-serif';
+    }
   } else if (fontsLoaded) {
-    fontFamily = resolvedQuran
-      ? (resolvedWeight === 'bold' ? 'Amiri_700Bold' : 'Amiri_400Regular')
-      : (resolvedWeight === 'bold' ? 'Tajawal_700Bold' : resolvedWeight === 'medium' ? 'Tajawal_500Medium' : 'Tajawal_400Regular');
+    if (isCairo) {
+      fontFamily = resolvedWeight === 'bold' ? 'Cairo_700Bold' : resolvedWeight === 'medium' ? 'Cairo_600SemiBold' : 'Cairo_400Regular';
+    } else if (isQuran) {
+      fontFamily = resolvedWeight === 'bold' ? 'Amiri_700Bold' : 'Amiri_400Regular';
+    } else {
+      fontFamily = resolvedWeight === 'bold' ? 'Tajawal_700Bold' : resolvedWeight === 'medium' ? 'Tajawal_500Medium' : 'Tajawal_400Regular';
+    }
     // On native iOS/Android, specifying font file already encapsulates weight
     fontWeight = undefined;
   }

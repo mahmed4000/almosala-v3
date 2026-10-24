@@ -12,6 +12,11 @@ import {
   Amiri_400Regular,
   Amiri_700Bold
 } from '@expo-google-fonts/amiri';
+import {
+  Cairo_400Regular,
+  Cairo_600SemiBold,
+  Cairo_700Bold
+} from '@expo-google-fonts/cairo';
 
 import { AppProvider, useApp } from './src/context/AppContext';
 import { MainNavigator } from './src/navigation/MainNavigator';
@@ -76,6 +81,9 @@ export default function App() {
     Tajawal_700Bold,
     Amiri_400Regular,
     Amiri_700Bold,
+    Cairo_400Regular,
+    Cairo_600SemiBold,
+    Cairo_700Bold,
   });
 
   if (!fontsLoaded && Platform.OS !== 'web') {
