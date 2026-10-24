@@ -995,17 +995,27 @@ export const QuranReaderScreen: React.FC = () => {
   };
 
   const renderAyahMarker = (arabicNumber: string, isPlaying: boolean = false, verse?: QuranVerse) => {
-    const isWeb = Platform.OS === 'web';
-    const badgeSize = isWeb
-      ? Math.max(28, Math.round(quranFontSize * 1.2))
-      : Math.max(26, Math.round(quranFontSize * 1.12));
-    const rosetteSize = isWeb ? Math.round(badgeSize * 1.15) : badgeSize;
-    const numSize = arabicNumber.length > 2
-      ? Math.max(8, Math.round(badgeSize * 0.33))
-      : Math.max(10, Math.round(badgeSize * 0.43));
+    if (Platform.OS === 'ios') {
+      return (
+        <Text
+          key={verse ? `ayah-marker-${verse.surahId}-${verse.ayahNumber}` : undefined}
+          style={{
+            fontFamily: 'Amiri_700Bold',
+            fontSize: Math.round(quranFontSize * 0.95),
+            color: isPlaying ? TOKENS.colors.primaryDark : TOKENS.colors.primary,
+          }}
+        >
+          {` ﴿${arabicNumber}﴾ `}
+        </Text>
+      );
+    }
 
-    // Vertical baseline correction: on iOS CoreText, inline attachments drop below text baseline.
-    const translateY = isWeb ? 0 : -Math.round(quranFontSize * 0.22);
+    // On Web (localhost): preserved exactly as calibrated for browser rendering
+    const badgeSize = Math.max(28, Math.round(quranFontSize * 1.2));
+    const rosetteSize = Math.round(badgeSize * 1.15);
+    const numSize = arabicNumber.length > 2
+      ? Math.max(8.5, Math.round(badgeSize * 0.34))
+      : Math.max(10.5, Math.round(badgeSize * 0.44));
 
     return (
       <View
@@ -1015,21 +1025,15 @@ export const QuranReaderScreen: React.FC = () => {
           height: badgeSize,
           alignItems: 'center',
           justifyContent: 'center',
-          marginHorizontal: isWeb ? 3 : 1,
-          transform: translateY !== 0 ? [{ translateY }] : undefined,
+          marginHorizontal: 3,
           position: 'relative',
         }}
       >
         <Text
           style={{
             position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
             fontFamily: 'Amiri_400Regular',
             fontSize: rosetteSize,
-            lineHeight: badgeSize,
             color: isPlaying ? TOKENS.colors.primaryDark : TOKENS.colors.primary,
             textAlign: 'center',
             includeFontPadding: false,
@@ -1037,24 +1041,30 @@ export const QuranReaderScreen: React.FC = () => {
         >
           ۝
         </Text>
-        <Text
+        <View
           style={{
             position: 'absolute',
             top: 0,
             left: 0,
             right: 0,
             bottom: 0,
-            fontFamily: 'Amiri_700Bold',
-            fontSize: numSize,
-            lineHeight: badgeSize,
-            color: isPlaying ? TOKENS.colors.primaryDark : c.textPrimary,
-            textAlign: 'center',
-            includeFontPadding: false,
-            paddingTop: isWeb ? 3 : 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingTop: 3,
           }}
         >
-          {arabicNumber}
-        </Text>
+          <Text
+            style={{
+              fontFamily: 'Amiri_700Bold',
+              fontSize: numSize,
+              color: isPlaying ? TOKENS.colors.primaryDark : c.textPrimary,
+              textAlign: 'center',
+              includeFontPadding: false,
+            }}
+          >
+            {arabicNumber}
+          </Text>
+        </View>
       </View>
     );
   };
@@ -1082,10 +1092,15 @@ export const QuranReaderScreen: React.FC = () => {
           {tajweedTexts[`${verse.surahId}-${verse.ayahNumber}`]
             ? renderTajweedText(tajweedTexts[`${verse.surahId}-${verse.ayahNumber}`], `v-${verse.surahId}-${verse.ayahNumber}`)
             : verse.text}
+          {Platform.OS === 'ios' ? renderAyahMarker(verse.arabicNumber, isPlaying, verse) : null}
         </Text>
-        {' '}
-        {renderAyahMarker(verse.arabicNumber, isPlaying, verse)}
-        {' '}
+        {Platform.OS !== 'ios' ? (
+          <>
+            {' '}
+            {renderAyahMarker(verse.arabicNumber, isPlaying, verse)}
+            {' '}
+          </>
+        ) : null}
       </React.Fragment>
     );
   };
