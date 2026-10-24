@@ -951,21 +951,61 @@ export const QuranReaderScreen: React.FC = () => {
   };
 
   const renderTajweedText = (markup: string, keyPrefix: string) => {
-    const cleanMarkup = markup.replace(/<span\s+class=end>.*?<\/span>/g, '');
-    const pieces = cleanMarkup.split(/(<tajweed\s+class=[^>]+>.*?<\/tajweed>)/g);
-    return pieces.map((piece, index) => {
-      const match = piece.match(/^<tajweed\s+class=([^>]+)>(.*?)<\/tajweed>$/);
-      if (!piece) return null;
-      return <Text key={`${keyPrefix}-tajweed-${index}`} style={{ fontFamily: 'Amiri_400Regular', color: match ? tajweedColor(match[1]) : c.textPrimary }}>{match ? match[2] : piece}</Text>;
-    });
+    const clean = markup.replace(/<span\s+class=end>.*?<\/span>/g, '');
+    const tokens: Array<{ text: string; rule: string | null }> = [];
+    const tagRegex = /<\/?([a-zA-Z0-9_]+)(?:\s+class=([^>]+))?\/?>/g;
+    let lastIndex = 0;
+    const tagStack: string[] = [];
+
+    let match: RegExpExecArray | null;
+    while ((match = tagRegex.exec(clean)) !== null) {
+      if (match.index > lastIndex) {
+        const text = clean.substring(lastIndex, match.index);
+        const currentRule = tagStack.length > 0 ? tagStack[tagStack.length - 1] : null;
+        if (text) tokens.push({ text, rule: currentRule });
+      }
+      const isClosing = match[0].startsWith('</');
+      const isSelfClosing = match[0].endsWith('/>');
+      const tagName = match[1];
+      const rule = match[2];
+
+      if (!isClosing && !isSelfClosing) {
+        tagStack.push(rule || tagName);
+      } else if (isClosing) {
+        tagStack.pop();
+      }
+      lastIndex = tagRegex.lastIndex;
+    }
+    if (lastIndex < clean.length) {
+      const text = clean.substring(lastIndex);
+      if (text) tokens.push({ text, rule: null });
+    }
+
+    return tokens.map((token, index) => (
+      <Text
+        key={`${keyPrefix}-tj-${index}`}
+        style={{
+          fontFamily: 'Amiri_400Regular',
+          color: token.rule ? tajweedColor(token.rule) : c.textPrimary,
+        }}
+      >
+        {token.text}
+      </Text>
+    ));
   };
 
   const renderAyahMarker = (arabicNumber: string, isPlaying: boolean = false, verse?: QuranVerse) => {
-    const badgeSize = Math.max(28, Math.round(quranFontSize * 1.2));
-    const rosetteSize = Math.round(badgeSize * 1.15);
+    const isWeb = Platform.OS === 'web';
+    const badgeSize = isWeb
+      ? Math.max(28, Math.round(quranFontSize * 1.2))
+      : Math.max(26, Math.round(quranFontSize * 1.12));
+    const rosetteSize = isWeb ? Math.round(badgeSize * 1.15) : badgeSize;
     const numSize = arabicNumber.length > 2
-      ? Math.max(8.5, Math.round(badgeSize * 0.34))
-      : Math.max(10.5, Math.round(badgeSize * 0.44));
+      ? Math.max(8, Math.round(badgeSize * 0.33))
+      : Math.max(10, Math.round(badgeSize * 0.43));
+
+    // Vertical baseline correction: on iOS CoreText, inline attachments drop below text baseline.
+    const translateY = isWeb ? 0 : -Math.round(quranFontSize * 0.22);
 
     return (
       <View
@@ -975,15 +1015,21 @@ export const QuranReaderScreen: React.FC = () => {
           height: badgeSize,
           alignItems: 'center',
           justifyContent: 'center',
-          marginHorizontal: 3,
+          marginHorizontal: isWeb ? 3 : 1,
+          transform: translateY !== 0 ? [{ translateY }] : undefined,
           position: 'relative',
         }}
       >
         <Text
           style={{
             position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
             fontFamily: 'Amiri_400Regular',
             fontSize: rosetteSize,
+            lineHeight: badgeSize,
             color: isPlaying ? TOKENS.colors.primaryDark : TOKENS.colors.primary,
             textAlign: 'center',
             includeFontPadding: false,
@@ -991,30 +1037,24 @@ export const QuranReaderScreen: React.FC = () => {
         >
           ۝
         </Text>
-        <View
+        <Text
           style={{
             position: 'absolute',
             top: 0,
             left: 0,
             right: 0,
             bottom: 0,
-            alignItems: 'center',
-            justifyContent: 'center',
-            paddingTop: Platform.OS === 'ios' ? 3.5 : 3,
+            fontFamily: 'Amiri_700Bold',
+            fontSize: numSize,
+            lineHeight: badgeSize,
+            color: isPlaying ? TOKENS.colors.primaryDark : c.textPrimary,
+            textAlign: 'center',
+            includeFontPadding: false,
+            paddingTop: isWeb ? 3 : 1,
           }}
         >
-          <Text
-            style={{
-              fontFamily: 'Amiri_700Bold',
-              fontSize: numSize,
-              color: isPlaying ? TOKENS.colors.primaryDark : c.textPrimary,
-              textAlign: 'center',
-              includeFontPadding: false,
-            }}
-          >
-            {arabicNumber}
-          </Text>
-        </View>
+          {arabicNumber}
+        </Text>
       </View>
     );
   };

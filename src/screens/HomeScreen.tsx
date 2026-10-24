@@ -336,7 +336,7 @@ export const HomeScreen: React.FC = () => {
                 {/* Prayer Name */}
                 <TextUI
                   cairo
-                  size={14}
+                  size={13}
                   weight="bold"
                   color={isNext ? TOKENS.colors.primaryDark : c.textPrimary}
                   style={{ marginBottom: 2 }}
