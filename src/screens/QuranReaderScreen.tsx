@@ -968,30 +968,25 @@ export const QuranReaderScreen: React.FC = () => {
       : Math.max(9.5, Math.round(badgeSize * 0.40));
 
     return (
-      <TouchableOpacity
+      <View
         key={verse ? `ayah-marker-${verse.surahId}-${verse.ayahNumber}` : undefined}
-        activeOpacity={0.7}
-        onPress={(event) => {
-          if (verse) {
-            event?.stopPropagation?.();
-            handleOpenAyahAction(verse);
-          }
-        }}
-        accessibilityRole="button"
-        accessibilityLabel={`آية ${arabicNumber}`}
         style={{
           width: badgeSize,
           height: badgeSize,
-          alignItems: 'center',
-          justifyContent: 'center',
           marginHorizontal: 3,
+          position: 'relative',
         }}
       >
         <Text
           style={{
             position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
             fontFamily: 'Amiri_400Regular',
             fontSize: rosetteSize,
+            lineHeight: badgeSize,
             color: isPlaying ? TOKENS.colors.primaryDark : TOKENS.colors.primary,
             textAlign: 'center',
             includeFontPadding: false,
@@ -1001,8 +996,14 @@ export const QuranReaderScreen: React.FC = () => {
         </Text>
         <Text
           style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
             fontFamily: 'Tajawal_700Bold',
             fontSize: numSize,
+            lineHeight: badgeSize,
             color: isPlaying ? TOKENS.colors.primaryDark : c.textPrimary,
             textAlign: 'center',
             includeFontPadding: false,
@@ -1011,7 +1012,7 @@ export const QuranReaderScreen: React.FC = () => {
         >
           {arabicNumber}
         </Text>
-      </TouchableOpacity>
+      </View>
     );
   };
 
