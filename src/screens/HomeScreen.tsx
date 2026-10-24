@@ -255,53 +255,120 @@ export const HomeScreen: React.FC = () => {
       </View>
 
       {/* 3. Daily 5 Prayers Horizontal Card Grid */}
-      <View style={{ marginBottom: 20 }}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-          <TextUI size={17} weight="bold" color={c.textPrimary}>
+      <View style={{ marginBottom: 22 }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+          <TextUI size={19} weight="bold" color={c.textPrimary}>
             {t('مواقيت الصلاة اليوم', "Today's Prayer Schedule")}
           </TextUI>
-          <TouchableOpacity onPress={() => navigate('prayer_times')}>
-            <TextUI size={14} weight="bold" color={TOKENS.colors.primary}>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => navigate('prayer_times')}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}
+          >
+            <TextUI size={14.5} weight="bold" color={TOKENS.colors.primary}>
               {t('عرض الكل', 'View All')}
             </TextUI>
+            <Feather name="chevron-left" size={16} color={TOKENS.colors.primary} />
           </TouchableOpacity>
         </View>
 
-        <View style={{ flexDirection: 'row', gap: 8, justifyContent: 'space-between' }}>
+        <View style={{ flexDirection: 'row', gap: 7, justifyContent: 'space-between' }}>
           {prayersList.map((p) => {
             const isNext = p.key === nextPrayerInfo.id;
             const hasBell = prayerBells[p.key];
+            const timeOnly = p.time.split(' ')[0];
+
             return (
               <View
                 key={p.key}
                 style={{
                   flex: 1,
-                  backgroundColor: isNext ? (themeMode === 'light' ? TOKENS.colors.primaryLight : '#382A20') : c.surface,
-                  borderRadius: 14,
-                  paddingVertical: 12,
-                  paddingHorizontal: 6,
+                  backgroundColor: isNext
+                    ? (themeMode === 'light' ? '#F7EEE3' : '#3E2E20')
+                    : c.surface,
+                  borderRadius: 16,
+                  paddingVertical: 14,
+                  paddingHorizontal: 4,
                   alignItems: 'center',
-                  borderWidth: 1,
-                  borderColor: isNext ? TOKENS.colors.primary : c.border
+                  borderWidth: isNext ? 2 : 1.5,
+                  borderColor: isNext
+                    ? TOKENS.colors.primary
+                    : (themeMode === 'light' ? '#EAE0D5' : '#3A2E24'),
+                  ...makeShadow(
+                    isNext ? '0 4px 14px rgba(140,94,60,0.22)' : '0 2px 8px rgba(0,0,0,0.04)',
+                    isNext ? TOKENS.colors.primary : '#000',
+                    isNext ? 0.22 : 0.04,
+                    isNext ? 6 : 3
+                  )
                 }}
               >
-                <Feather name={p.icon} size={18} color={isNext ? TOKENS.colors.primaryDark : c.textSecondary} />
-                <TextUI size={13.5} weight={isNext ? 'bold' : 'medium'} color={isNext ? TOKENS.colors.primaryDark : c.textPrimary} style={{ marginTop: 4 }}>
+                {/* Prayer Icon */}
+                <View
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: 16,
+                    backgroundColor: isNext
+                      ? (themeMode === 'light' ? '#EAD6C3' : '#4E3A29')
+                      : (themeMode === 'light' ? '#F5EFE8' : '#2A2018'),
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginBottom: 4
+                  }}
+                >
+                  <Feather
+                    name={p.icon}
+                    size={17}
+                    color={isNext ? TOKENS.colors.primaryDark : TOKENS.colors.primary}
+                  />
+                </View>
+
+                {/* Prayer Name (Large, Bold, High Contrast) */}
+                <TextUI
+                  size={14.5}
+                  weight="bold"
+                  color={isNext ? TOKENS.colors.primaryDark : c.textPrimary}
+                  style={{ marginBottom: 3 }}
+                  numberOfLines={1}
+                >
                   {p.nameAr}
                 </TextUI>
-                <TextUI size={13} weight="bold" color={isNext ? TOKENS.colors.primaryDark : c.textSecondary} style={{ marginTop: 2 }}>
-                  {p.time.split(' ')[0]}
+
+                {/* Prayer Time (Crisp Digital Time with comfortable letter-spacing) */}
+                <TextUI
+                  size={16}
+                  weight="bold"
+                  color={isNext ? TOKENS.colors.primaryDark : c.textPrimary}
+                  style={{ letterSpacing: 0.6 }}
+                  numberOfLines={1}
+                >
+                  {timeOnly}
                 </TextUI>
 
+                {/* Notification Bell with clickable circular pill */}
                 <TouchableOpacity
                   activeOpacity={0.7}
                   onPress={() => togglePrayerBell(p.key)}
-                  style={{ marginTop: 6 }}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  style={{
+                    width: 26,
+                    height: 26,
+                    borderRadius: 13,
+                    backgroundColor: hasBell
+                      ? (themeMode === 'light' ? '#FFF5EA' : '#3D2D1E')
+                      : (themeMode === 'light' ? '#F4EDE4' : '#291F17'),
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginTop: 8,
+                    borderWidth: 1,
+                    borderColor: hasBell ? TOKENS.colors.secondary : 'transparent'
+                  }}
                 >
                   <Feather
                     name={hasBell ? 'bell' : 'bell-off'}
-                    size={14}
-                    color={hasBell ? TOKENS.colors.secondary : c.textSecondary}
+                    size={13}
+                    color={hasBell ? TOKENS.colors.secondary : (themeMode === 'light' ? '#9C8878' : '#736152')}
                   />
                 </TouchableOpacity>
               </View>
