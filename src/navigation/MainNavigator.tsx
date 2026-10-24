@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import { View, TouchableOpacity, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useApp } from '../context/AppContext';
 import { TextUI } from '../components/common/TextUI';
@@ -24,7 +24,7 @@ import { SettingsScreen } from '../screens/SettingsScreen';
 import { DownloadsScreen } from '../screens/DownloadsScreen';
 
 export const MainNavigator: React.FC = () => {
-  const { screen, navigate, theme, themeMode, t, triggerHaptic } = useApp();
+  const { screen, navigate, theme, triggerHaptic } = useApp();
   const c = theme;
 
   const renderCurrentScreen = () => {
@@ -79,7 +79,7 @@ export const MainNavigator: React.FC = () => {
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       {/* Screen Render with reserved space for fixed bottom navigation */}
-      <View style={{ flex: 1, paddingBottom: isImmersiveScreen ? 0 : Platform.OS === 'ios' ? 84 : 70 }}>
+      <View style={{ flex: 1, paddingBottom: isImmersiveScreen ? 0 : Platform.OS === 'ios' ? 80 : 62 }}>
         {renderCurrentScreen()}
       </View>
 
@@ -90,8 +90,8 @@ export const MainNavigator: React.FC = () => {
           bottom: 0,
           left: 0,
           right: 0,
-          height: Platform.OS === 'ios' ? 84 : 70,
-          paddingBottom: Platform.OS === 'ios' ? 18 : 6,
+          height: Platform.OS === 'ios' ? 80 : 62,
+          paddingBottom: Platform.OS === 'ios' ? 16 : 4,
           backgroundColor: c.surfaceElevated,
           borderTopWidth: 1,
           borderColor: c.border,
@@ -99,7 +99,7 @@ export const MainNavigator: React.FC = () => {
           alignItems: 'center',
           justifyContent: 'space-around',
           paddingHorizontal: 8,
-          ...makeShadow('0 -4px 16px rgba(0,0,0,0.06)', '#000', 0.06, 6)
+          ...makeShadow('0 -2px 10px rgba(0,0,0,0.04)', '#000', 0.04, 4)
         }}
       >
         {navItems.map((item) => {
@@ -119,20 +119,20 @@ export const MainNavigator: React.FC = () => {
               style={{
                 alignItems: 'center',
                 justifyContent: 'center',
-                paddingVertical: 4,
-                paddingHorizontal: 12
+                paddingVertical: 2,
+                paddingHorizontal: 10
               }}
             >
               <Feather
                 name={item.icon}
-                size={21}
+                size={19}
                 color={isActive ? TOKENS.colors.primary : c.textSecondary}
               />
               <TextUI
-                size={11}
+                size={10.5}
                 weight={isActive ? 'bold' : 'medium'}
                 color={isActive ? TOKENS.colors.primary : c.textSecondary}
-                style={{ marginTop: 3 }}
+                style={{ marginTop: 2 }}
               >
                 {item.labelAr}
               </TextUI>
