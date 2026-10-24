@@ -42,7 +42,7 @@ export const SettingsScreen: React.FC = () => {
       >
         {/* 1. Theme Setting */}
         <View style={{ backgroundColor: c.surface, borderRadius: 18, padding: 16, marginBottom: 16, borderWidth: 1, borderColor: c.border }}>
-          <TextUI size={15} weight="bold" color={c.textPrimary} style={{ marginBottom: 12 }}>
+          <TextUI variant="h4" color={c.textPrimary} style={{ marginBottom: 12 }}>
             {t('المظهر العام', 'Appearance')}
           </TextUI>
 
@@ -67,7 +67,7 @@ export const SettingsScreen: React.FC = () => {
               }}
             >
               <Feather name="sun" size={16} color={themeMode === 'light' ? TOKENS.colors.primary : c.textSecondary} />
-              <TextUI size={13} weight="bold" color={themeMode === 'light' ? TOKENS.colors.primaryDark : c.textPrimary}>
+              <TextUI variant="bodyMedium" weight="bold" color={themeMode === 'light' ? TOKENS.colors.primaryDark : c.textPrimary}>
                 أندلسي نهاري
               </TextUI>
             </TouchableOpacity>
@@ -92,7 +92,7 @@ export const SettingsScreen: React.FC = () => {
               }}
             >
               <Feather name="moon" size={16} color={themeMode === 'dark' ? TOKENS.colors.secondary : c.textSecondary} />
-              <TextUI size={13} weight="bold" color={themeMode === 'dark' ? '#FFFFFF' : c.textPrimary}>
+              <TextUI variant="bodyMedium" weight="bold" color={themeMode === 'dark' ? '#FFFFFF' : c.textPrimary}>
                 أندلسي ليلي
               </TextUI>
             </TouchableOpacity>
@@ -101,7 +101,7 @@ export const SettingsScreen: React.FC = () => {
 
         {/* 2. Language Setting */}
         <View style={{ backgroundColor: c.surface, borderRadius: 18, padding: 16, marginBottom: 16, borderWidth: 1, borderColor: c.border }}>
-          <TextUI size={15} weight="bold" color={c.textPrimary} style={{ marginBottom: 12 }}>
+          <TextUI variant="h4" color={c.textPrimary} style={{ marginBottom: 12 }}>
             {t('لغة التطبيق', 'App Language')}
           </TextUI>
 
@@ -122,7 +122,7 @@ export const SettingsScreen: React.FC = () => {
                 borderColor: lang === 'ar' ? TOKENS.colors.primary : c.border
               }}
             >
-              <TextUI size={13} weight="bold" color={lang === 'ar' ? TOKENS.colors.primaryDark : c.textPrimary}>
+              <TextUI variant="bodyMedium" weight="bold" color={lang === 'ar' ? TOKENS.colors.primaryDark : c.textPrimary}>
                 العربية (افتراضي)
               </TextUI>
             </TouchableOpacity>
@@ -143,7 +143,7 @@ export const SettingsScreen: React.FC = () => {
                 borderColor: lang === 'en' ? TOKENS.colors.primary : c.border
               }}
             >
-              <TextUI size={13} weight="bold" color={lang === 'en' ? TOKENS.colors.primaryDark : c.textPrimary}>
+              <TextUI variant="bodyMedium" weight="bold" color={lang === 'en' ? TOKENS.colors.primaryDark : c.textPrimary}>
                 English
               </TextUI>
             </TouchableOpacity>
@@ -152,7 +152,7 @@ export const SettingsScreen: React.FC = () => {
 
         {/* 3. Notification Test */}
         <View style={{ backgroundColor: c.surface, borderRadius: 18, padding: 16, marginBottom: 16, borderWidth: 1, borderColor: c.border }}>
-          <TextUI size={15} weight="bold" color={c.textPrimary} style={{ marginBottom: 12 }}>
+          <TextUI variant="h4" color={c.textPrimary} style={{ marginBottom: 12 }}>
             {t('تنبيهات الأذان والصلوات', 'Adhan Notifications')}
           </TextUI>
 
@@ -175,7 +175,7 @@ export const SettingsScreen: React.FC = () => {
             }}
           >
             <Feather name="bell" size={16} color={TOKENS.colors.primaryDark} />
-            <TextUI size={13} weight="bold" color={TOKENS.colors.primaryDark}>
+            <TextUI variant="bodyMedium" weight="bold" color={TOKENS.colors.primaryDark}>
               {t('إرسال تنبيه أذان تجريبي الآن', 'Send Test Adhan Alert')}
             </TextUI>
           </TouchableOpacity>
@@ -183,7 +183,7 @@ export const SettingsScreen: React.FC = () => {
 
         {/* 4. Offline Downloads Manager */}
         <View style={{ backgroundColor: c.surface, borderRadius: 18, padding: 16, marginBottom: 16, borderWidth: 1, borderColor: c.border }}>
-          <TextUI size={15} weight="bold" color={c.textPrimary} style={{ marginBottom: 8 }}>
+          <TextUI variant="h4" color={c.textPrimary} style={{ marginBottom: 8 }}>
             {t('التخزين والملفات المحملة', 'Storage & Downloads')}
           </TextUI>
 
@@ -200,10 +200,10 @@ export const SettingsScreen: React.FC = () => {
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
               <Feather name="download-cloud" size={18} color={TOKENS.colors.primary} />
               <View>
-                <TextUI size={14} weight="bold" color={c.textPrimary}>
+                <TextUI variant="h4" color={c.textPrimary}>
                   {t('إدارة التنزيلات والمساحة', 'Manage Downloads & Space')}
                 </TextUI>
-                <TextUI size={11} color={c.textSecondary}>
+                <TextUI variant="caption" color={c.textSecondary}>
                   {t('عرض الدروس المحملة وتفريغ ذاكرة الهاتف', 'View offline lessons and free storage')}
                 </TextUI>
               </View>

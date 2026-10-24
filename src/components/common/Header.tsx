@@ -30,7 +30,7 @@ export const Header: React.FC<HeaderProps> = ({
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingHorizontal: 14,
-        paddingTop: Platform.OS === 'ios' ? 60 : (Platform.OS === 'web' ? 46 : 14),
+        paddingTop: Platform.OS === 'ios' ? 56 : (Platform.OS === 'web' ? 42 : 14),
         paddingBottom: 12,
         backgroundColor: c.bg,
         borderBottomWidth: 1,
@@ -50,16 +50,16 @@ export const Header: React.FC<HeaderProps> = ({
               flexDirection: 'row',
               alignItems: 'center',
               gap: 5,
-              paddingHorizontal: 13,
-              paddingVertical: 7,
+              paddingHorizontal: 12,
+              paddingVertical: 6,
               borderRadius: TOKENS.radius.pill,
               backgroundColor: c.surface,
               borderWidth: 1,
               borderColor: c.border
             }}
           >
-            <Feather name={isRTL ? "arrow-right" : "arrow-left"} size={16} color={TOKENS.colors.primary} />
-            <TextUI size={13} weight="bold" color={TOKENS.colors.primary}>
+            <Feather name={isRTL ? "arrow-right" : "arrow-left"} size={15} color={TOKENS.colors.primary} />
+            <TextUI variant="captionBold" color={TOKENS.colors.primary}>
               رجوع
             </TextUI>
           </TouchableOpacity>
@@ -70,11 +70,11 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Center: Title & Subtitle */}
       <View style={{ flex: 1, alignItems: 'center', paddingHorizontal: 8 }}>
-        <TextUI size={17} weight="bold" color={c.textPrimary} numberOfLines={1}>
+        <TextUI variant="h3" color={c.textPrimary} numberOfLines={1}>
           {title}
         </TextUI>
         {subtitle ? (
-          <TextUI size={12} color={c.textSecondary} style={{ marginTop: 2 }} numberOfLines={1}>
+          <TextUI variant="caption" color={c.textSecondary} style={{ marginTop: 2 }} numberOfLines={1}>
             {subtitle}
           </TextUI>
         ) : null}

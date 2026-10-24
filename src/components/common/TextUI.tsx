@@ -1,8 +1,25 @@
 import React from 'react';
 import { Text, Platform, StyleSheet, TextStyle, StyleProp, I18nManager } from 'react-native';
+import { TOKENS } from '../../constants/tokens';
+
+export type TextUIVariant =
+  | 'h1'
+  | 'h2'
+  | 'h3'
+  | 'h4'
+  | 'bodyLarge'
+  | 'body'
+  | 'bodyMedium'
+  | 'bodyBold'
+  | 'caption'
+  | 'captionBold'
+  | 'badge'
+  | 'quranVerse'
+  | 'quranHeader';
 
 interface TextUIProps {
   children?: React.ReactNode;
+  variant?: TextUIVariant;
   style?: StyleProp<TextStyle>;
   weight?: 'regular' | 'medium' | 'bold';
   size?: number;
@@ -17,26 +34,32 @@ interface TextUIProps {
 
 export const TextUI: React.FC<TextUIProps> = ({
   children,
+  variant,
   style,
-  weight = 'regular',
-  size = 15,
+  weight,
+  size,
   color,
   align,
-  quran = false,
+  quran,
   numberOfLines,
   onPress,
   fontsLoaded = true,
   isRTL = true
 }) => {
+  const variantToken = variant ? TOKENS.typography[variant] : null;
+  const resolvedSize = size ?? variantToken?.fontSize ?? 14;
+  const resolvedWeight = weight ?? variantToken?.weight ?? 'regular';
+  const resolvedQuran = quran ?? (variantToken as any)?.quran ?? false;
+
   let fontFamily: string | undefined = undefined;
-  let fontWeight: any = weight === 'bold' ? '700' : weight === 'medium' ? '500' : '400';
+  let fontWeight: any = resolvedWeight === 'bold' ? '700' : resolvedWeight === 'medium' ? '500' : '400';
 
   if (Platform.OS === 'web') {
-    fontFamily = quran ? 'Amiri, serif' : 'Tajawal, "Noto Sans Arabic", -apple-system, sans-serif';
+    fontFamily = resolvedQuran ? 'Amiri, serif' : 'Tajawal, "Noto Sans Arabic", -apple-system, sans-serif';
   } else if (fontsLoaded) {
-    fontFamily = quran
-      ? (weight === 'bold' ? 'Amiri_700Bold' : 'Amiri_400Regular')
-      : (weight === 'bold' ? 'Tajawal_700Bold' : weight === 'medium' ? 'Tajawal_500Medium' : 'Tajawal_400Regular');
+    fontFamily = resolvedQuran
+      ? (resolvedWeight === 'bold' ? 'Amiri_700Bold' : 'Amiri_400Regular')
+      : (resolvedWeight === 'bold' ? 'Tajawal_700Bold' : resolvedWeight === 'medium' ? 'Tajawal_500Medium' : 'Tajawal_400Regular');
     // On native iOS/Android, specifying font file already encapsulates weight
     fontWeight = undefined;
   }
@@ -51,7 +74,8 @@ export const TextUI: React.FC<TextUIProps> = ({
     else if (targetAlign === 'left') resolvedAlign = 'right';
   }
 
-  const { textAlign: _ignored, ...restStyle } = flatStyle;
+  const resolvedLineHeight = flatStyle.lineHeight ?? variantToken?.lineHeight;
+  const { textAlign: _ignored, lineHeight: _ignoredLineHeight, ...restStyle } = flatStyle;
 
   return (
     <Text
@@ -60,8 +84,9 @@ export const TextUI: React.FC<TextUIProps> = ({
       style={[
         restStyle,
         {
-          fontSize: size,
-          color: color || (quran ? '#2D1E16' : '#2D1E16'),
+          fontSize: resolvedSize,
+          ...(resolvedLineHeight ? { lineHeight: resolvedLineHeight } : {}),
+          color: color || flatStyle.color || '#2D1E16',
           textAlign: resolvedAlign,
           fontFamily,
           fontWeight,
@@ -74,3 +99,4 @@ export const TextUI: React.FC<TextUIProps> = ({
     </Text>
   );
 };
+

@@ -110,16 +110,16 @@ export const Hadith40Screen: React.FC = () => {
                       borderColor: TOKENS.colors.primary
                     }}
                   >
-                    <TextUI size={13} weight="bold" color={TOKENS.colors.primaryDark}>
+                    <TextUI variant="captionBold" color={TOKENS.colors.primaryDark}>
                       {toArabicNumber(item.id)}
                     </TextUI>
                   </View>
 
                   <View style={{ flex: 1 }}>
-                    <TextUI size={15} weight="bold" color={c.textPrimary}>
+                    <TextUI variant="h4" color={c.textPrimary}>
                       {item.titleAr}
                     </TextUI>
-                    <TextUI size={11} color={c.textSecondary} style={{ marginTop: 2 }}>
+                    <TextUI variant="caption" color={c.textSecondary} style={{ marginTop: 2 }}>
                       {item.titleEn}
                     </TextUI>
                   </View>
@@ -130,7 +130,7 @@ export const Hadith40Screen: React.FC = () => {
 
               {isExpanded && (
                 <View style={{ marginTop: 14, paddingTop: 14, borderTopWidth: 1, borderColor: c.border }}>
-                  <TextUI quran size={16} color={c.textPrimary} style={{ lineHeight: 28, textAlign: 'justify', marginBottom: 12 }}>
+                  <TextUI variant="quranVerse" size={16} color={c.textPrimary} style={{ lineHeight: 28, textAlign: 'justify', marginBottom: 12 }}>
                     {item.textAr}
                   </TextUI>
 
@@ -144,12 +144,12 @@ export const Hadith40Screen: React.FC = () => {
                         borderColor: TOKENS.colors.secondary
                       }}
                     >
-                      <TextUI size={12} weight="bold" color={TOKENS.colors.primaryDark} style={{ marginBottom: 4 }}>
+                      <TextUI variant="captionBold" color={TOKENS.colors.primaryDark} style={{ marginBottom: 4 }}>
                         💡 الفوائد والدروس المستفادة:
                       </TextUI>
                       <View style={{ gap: 5 }}>
                         {item.lessons.map((lesson: string, index: number) => (
-                          <TextUI key={`${item.id}-lesson-${index}`} size={12} color={TOKENS.colors.primaryDark} style={{ lineHeight: 18 }}>
+                          <TextUI key={`${item.id}-lesson-${index}`} variant="caption" color={TOKENS.colors.primaryDark} style={{ lineHeight: 18 }}>
                             • {lesson}
                           </TextUI>
                         ))}

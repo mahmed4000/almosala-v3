@@ -63,10 +63,10 @@ export const DownloadsScreen: React.FC = () => {
           }}
         >
           <View>
-            <TextUI size={13} color={c.textSecondary}>
+            <TextUI variant="caption" color={c.textSecondary}>
               المساحة المستخدمة من ذاكرة الهاتف
             </TextUI>
-            <TextUI size={28} weight="bold" color={TOKENS.colors.primaryDark} style={{ marginTop: 4 }}>
+            <TextUI variant="h1" size={24} color={TOKENS.colors.primaryDark} style={{ marginTop: 4 }}>
               {toArabicNumber(totalMB.toFixed(1))} ميجابايت
             </TextUI>
           </View>
@@ -88,10 +88,10 @@ export const DownloadsScreen: React.FC = () => {
         {downloadedList.length === 0 ? (
           <View style={{ alignItems: 'center', paddingVertical: 40 }}>
             <Feather name="download-cloud" size={48} color={c.textSecondary} style={{ marginBottom: 12, opacity: 0.5 }} />
-            <TextUI size={16} weight="bold" color={c.textPrimary}>
+            <TextUI variant="h4" color={c.textPrimary}>
               لا توجد دروس محملة حالياً
             </TextUI>
-            <TextUI size={12} color={c.textSecondary} style={{ marginTop: 4, textAlign: 'center' }}>
+            <TextUI variant="caption" color={c.textSecondary} style={{ marginTop: 4, textAlign: 'center' }}>
               يمكنك تحميل دروس وسلاسل كراسي الحرمين الشريفين للاستماع إليها بدون اتصال بالإنترنت.
             </TextUI>
           </View>
@@ -113,13 +113,13 @@ export const DownloadsScreen: React.FC = () => {
                 }}
               >
                 <View style={{ flex: 1, marginRight: 12 }}>
-                  <TextUI size={14} weight="bold" color={c.textPrimary} numberOfLines={1}>
+                  <TextUI variant="h4" color={c.textPrimary} numberOfLines={1}>
                     {item.titleAr}
                   </TextUI>
-                  <TextUI size={12} color={TOKENS.colors.primary} style={{ marginTop: 2 }}>
+                  <TextUI variant="bodyMedium" color={TOKENS.colors.primary} style={{ marginTop: 2 }}>
                     {item.scholarAr}
                   </TextUI>
-                  <TextUI size={11} color={c.textSecondary} style={{ marginTop: 2 }}>
+                  <TextUI variant="caption" color={c.textSecondary} style={{ marginTop: 2 }}>
                     💾 {item.sizeMB} • {item.downloadedAt}
                   </TextUI>
                 </View>

@@ -60,10 +60,10 @@ export const AzkarCategoriesScreen: React.FC = () => {
               </View>
 
               <View style={{ flex: 1 }}>
-                <TextUI size={16} weight="bold" color={c.textPrimary}>
+                <TextUI variant="h4" color={c.textPrimary}>
                   {cat.titleAr}
                 </TextUI>
-                <TextUI size={12} color={c.textSecondary} style={{ marginTop: 2 }}>
+                <TextUI variant="caption" color={c.textSecondary} style={{ marginTop: 2 }}>
                   {cat.subtitleAr}
                 </TextUI>
               </View>
@@ -77,7 +77,7 @@ export const AzkarCategoriesScreen: React.FC = () => {
                     borderRadius: TOKENS.radius.pill
                   }}
                 >
-                  <TextUI size={11} weight="bold" color={TOKENS.colors.primaryDark}>
+                  <TextUI variant="captionBold" color={TOKENS.colors.primaryDark}>
                     {toArabicNumber(cat.count)} ذكر
                   </TextUI>
                 </View>

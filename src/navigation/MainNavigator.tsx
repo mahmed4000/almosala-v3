@@ -129,7 +129,7 @@ export const MainNavigator: React.FC = () => {
                 color={isActive ? TOKENS.colors.primary : c.textSecondary}
               />
               <TextUI
-                size={10.5}
+                variant="badge"
                 weight={isActive ? 'bold' : 'medium'}
                 color={isActive ? TOKENS.colors.primary : c.textSecondary}
                 style={{ marginTop: 2 }}

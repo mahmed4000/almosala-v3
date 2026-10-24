@@ -66,7 +66,7 @@ export const RuqyahScreen: React.FC = () => {
             backgroundColor: activeTab === 'quran' ? TOKENS.colors.primary : 'transparent'
           }}
         >
-          <TextUI size={13} weight="bold" color={activeTab === 'quran' ? '#FFFFFF' : c.textPrimary}>
+          <TextUI variant="captionBold" color={activeTab === 'quran' ? '#FFFFFF' : c.textPrimary}>
             📖 آيات الرقية
           </TextUI>
         </TouchableOpacity>
@@ -79,13 +79,13 @@ export const RuqyahScreen: React.FC = () => {
           }}
           style={{
             flex: 1,
-            paddingVertical: 9,
+            paddingVertical: 8,
             borderRadius: TOKENS.radius.pill,
             alignItems: 'center',
             backgroundColor: activeTab === 'sunnah' ? TOKENS.colors.primary : 'transparent'
           }}
         >
-          <TextUI size={13} weight="bold" color={activeTab === 'sunnah' ? '#FFFFFF' : c.textPrimary}>
+          <TextUI variant="captionBold" color={activeTab === 'sunnah' ? '#FFFFFF' : c.textPrimary}>
             🤲 أدعية السنة
           </TextUI>
         </TouchableOpacity>
@@ -98,13 +98,13 @@ export const RuqyahScreen: React.FC = () => {
           }}
           style={{
             flex: 1,
-            paddingVertical: 9,
+            paddingVertical: 8,
             borderRadius: TOKENS.radius.pill,
             alignItems: 'center',
             backgroundColor: activeTab === 'adab' ? TOKENS.colors.primary : 'transparent'
           }}
         >
-          <TextUI size={13} weight="bold" color={activeTab === 'adab' ? '#FFFFFF' : c.textPrimary}>
+          <TextUI variant="captionBold" color={activeTab === 'adab' ? '#FFFFFF' : c.textPrimary}>
             ✨ الآداب
           </TextUI>
         </TouchableOpacity>
@@ -134,7 +134,7 @@ export const RuqyahScreen: React.FC = () => {
               }}
             >
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                <TextUI size={15} weight="bold" color={TOKENS.colors.primaryDark}>
+                <TextUI variant="h4" color={TOKENS.colors.primaryDark}>
                   {item.titleAr || item.title}
                 </TextUI>
 
@@ -154,7 +154,7 @@ export const RuqyahScreen: React.FC = () => {
                       borderColor: isDone ? '#4CAF50' : TOKENS.colors.primary
                     }}
                   >
-                    <TextUI size={12} weight="bold" color={isDone ? '#2E7D32' : TOKENS.colors.primaryDark}>
+                    <TextUI variant="captionBold" color={isDone ? '#2E7D32' : TOKENS.colors.primaryDark}>
                       {toArabicNumber(count)} / {toArabicNumber(target)}
                     </TextUI>
                     <Feather name={isDone ? 'check' : 'rotate-cw'} size={12} color={isDone ? '#2E7D32' : TOKENS.colors.primary} />
@@ -163,16 +163,16 @@ export const RuqyahScreen: React.FC = () => {
               </View>
 
               <TextUI
-                quran={activeTab === 'quran'}
-                size={activeTab === 'quran' ? 18 : 15}
+                variant={activeTab === 'quran' ? 'quranVerse' : 'body'}
+                size={activeTab === 'quran' ? 17 : 14}
                 color={c.textPrimary}
-                style={{ lineHeight: 28, textAlign: 'justify', marginVertical: 6 }}
+                style={{ lineHeight: activeTab === 'quran' ? 30 : 22, textAlign: 'justify', marginVertical: 6 }}
               >
                 {item.textAr || item.text}
               </TextUI>
 
               {item.source ? (
-                <TextUI size={11} color={c.textSecondary} style={{ marginTop: 4 }}>
+                <TextUI variant="caption" color={c.textSecondary} style={{ marginTop: 4 }}>
                   📚 {item.source}
                 </TextUI>
               ) : null}

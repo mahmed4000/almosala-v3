@@ -110,15 +110,15 @@ export const AllahNamesScreen: React.FC = () => {
                   marginBottom: 6
                 }}
               >
-                <TextUI size={11} weight="bold" color={TOKENS.colors.primaryDark}>
+                <TextUI variant="badge" color={TOKENS.colors.primaryDark}>
                   {toArabicNumber(item.id)}
                 </TextUI>
               </View>
 
-              <TextUI quran size={20} weight="bold" color={TOKENS.colors.primaryDark}>
+              <TextUI variant="quranHeader" size={18} color={TOKENS.colors.primaryDark}>
                 {item.nameAr}
               </TextUI>
-              <TextUI size={11} color={TOKENS.colors.secondary} style={{ marginTop: 2 }}>
+              <TextUI variant="caption" color={TOKENS.colors.secondary} style={{ marginTop: 2 }}>
                 {item.nameEn}
               </TextUI>
 
@@ -132,7 +132,7 @@ export const AllahNamesScreen: React.FC = () => {
                     width: '100%'
                   }}
                 >
-                  <TextUI size={11} color={c.textSecondary} style={{ textAlign: 'center', lineHeight: 16 }}>
+                  <TextUI variant="caption" color={c.textSecondary} style={{ textAlign: 'center', lineHeight: 16 }}>
                     {item.meaningAr}
                   </TextUI>
                 </View>

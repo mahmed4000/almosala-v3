@@ -53,12 +53,12 @@ export const ImsakiahScreen: React.FC = () => {
             marginBottom: 8
           }}
         >
-          <TextUI size={11} weight="bold" color="#FFFFFF" style={{ width: 44, textAlign: 'center' }}>اليوم</TextUI>
-          <TextUI size={11} weight="bold" color="#FFFFFF" style={{ flex: 1, textAlign: 'center' }}>الإمساك</TextUI>
-          <TextUI size={11} weight="bold" color="#FFFFFF" style={{ flex: 1, textAlign: 'center' }}>الفجر</TextUI>
-          <TextUI size={11} weight="bold" color="#FFFFFF" style={{ flex: 1, textAlign: 'center' }}>الشروق</TextUI>
-          <TextUI size={11} weight="bold" color="#FFFFFF" style={{ flex: 1, textAlign: 'center' }}>المغرب</TextUI>
-          <TextUI size={11} weight="bold" color="#FFFFFF" style={{ flex: 1, textAlign: 'center' }}>العشاء</TextUI>
+          <TextUI variant="captionBold" color="#FFFFFF" style={{ width: 44, textAlign: 'center' }}>اليوم</TextUI>
+          <TextUI variant="captionBold" color="#FFFFFF" style={{ flex: 1, textAlign: 'center' }}>الإمساك</TextUI>
+          <TextUI variant="captionBold" color="#FFFFFF" style={{ flex: 1, textAlign: 'center' }}>الفجر</TextUI>
+          <TextUI variant="captionBold" color="#FFFFFF" style={{ flex: 1, textAlign: 'center' }}>الشروق</TextUI>
+          <TextUI variant="captionBold" color="#FFFFFF" style={{ flex: 1, textAlign: 'center' }}>المغرب</TextUI>
+          <TextUI variant="captionBold" color="#FFFFFF" style={{ flex: 1, textAlign: 'center' }}>العشاء</TextUI>
         </View>
 
         {/* Days Rows */}
@@ -79,22 +79,22 @@ export const ImsakiahScreen: React.FC = () => {
                 borderColor: isToday ? TOKENS.colors.primary : c.border
               }}
             >
-              <TextUI size={11} weight="bold" color={isToday ? TOKENS.colors.primaryDark : c.textPrimary} style={{ width: 44, textAlign: 'center' }}>
+              <TextUI variant="captionBold" color={isToday ? TOKENS.colors.primaryDark : c.textPrimary} style={{ width: 44, textAlign: 'center' }}>
                 {toArabicNumber(d.dayNum)}
               </TextUI>
-              <TextUI size={11} color={c.textSecondary} style={{ flex: 1, textAlign: 'center' }}>
+              <TextUI variant="caption" color={c.textSecondary} style={{ flex: 1, textAlign: 'center' }}>
                 {d.fajr}
               </TextUI>
-              <TextUI size={11} weight={isToday ? 'bold' : 'regular'} color={c.textPrimary} style={{ flex: 1, textAlign: 'center' }}>
+              <TextUI variant="caption" weight={isToday ? 'bold' : 'regular'} color={c.textPrimary} style={{ flex: 1, textAlign: 'center' }}>
                 {d.fajr}
               </TextUI>
-              <TextUI size={11} color={c.textSecondary} style={{ flex: 1, textAlign: 'center' }}>
+              <TextUI variant="caption" color={c.textSecondary} style={{ flex: 1, textAlign: 'center' }}>
                 {d.sunrise}
               </TextUI>
-              <TextUI size={11} weight="bold" color={TOKENS.colors.primary} style={{ flex: 1, textAlign: 'center' }}>
+              <TextUI variant="captionBold" color={TOKENS.colors.primary} style={{ flex: 1, textAlign: 'center' }}>
                 {d.maghrib}
               </TextUI>
-              <TextUI size={11} color={c.textSecondary} style={{ flex: 1, textAlign: 'center' }}>
+              <TextUI variant="caption" color={c.textSecondary} style={{ flex: 1, textAlign: 'center' }}>
                 {d.isha}
               </TextUI>
             </View>

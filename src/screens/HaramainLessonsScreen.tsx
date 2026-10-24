@@ -365,10 +365,10 @@ export const HaramainLessonsScreen: React.FC = () => {
           >
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
               <View style={{ flex: 1 }}>
-                <TextUI size={16} weight="bold" color={TOKENS.colors.primaryDark}>
+                <TextUI variant="h4" color={TOKENS.colors.primaryDark}>
                   {course.titleAr}
                 </TextUI>
-                <TextUI size={13} weight="medium" color={TOKENS.colors.primary} style={{ marginTop: 2 }}>
+                <TextUI variant="bodyMedium" color={TOKENS.colors.primary} style={{ marginTop: 2 }}>
                   {course.scholarAr}
                 </TextUI>
               </View>
@@ -381,24 +381,24 @@ export const HaramainLessonsScreen: React.FC = () => {
                   borderRadius: TOKENS.radius.pill
                 }}
               >
-                <TextUI size={11} weight="bold" color={TOKENS.colors.primaryDark}>
+                <TextUI variant="badge" color={TOKENS.colors.primaryDark}>
                   {course.categoryAr}
                 </TextUI>
               </View>
             </View>
 
-            <TextUI size={12} color={c.textSecondary} style={{ lineHeight: 18, marginBottom: 12 }}>
+            <TextUI variant="caption" color={c.textSecondary} style={{ lineHeight: 18, marginBottom: 12 }}>
               {course.descriptionAr}
             </TextUI>
 
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 10 }}>
               <Feather name="headphones" size={13} color={TOKENS.colors.primary} />
-              <TextUI size={11} color={c.textSecondary}>{toArabicNumber(course.lessons.length)} درس مسجل</TextUI>
+              <TextUI variant="caption" color={c.textSecondary}>{toArabicNumber(course.lessons.length)} درس مسجل</TextUI>
             </View>
 
             <TouchableOpacity onPress={() => navigate('haramain_book', { courseId: course.id })} activeOpacity={0.8} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 11, backgroundColor: TOKENS.colors.primaryDark, borderRadius: 12, marginBottom: 12 }}>
               <Feather name="book-open" size={16} color="#FFFFFF" />
-              <TextUI size={12} weight="bold" color="#FFFFFF">افتح صفحة الكتاب وجميع الدروس</TextUI>
+              <TextUI variant="captionBold" color="#FFFFFF">افتح صفحة الكتاب وجميع الدروس</TextUI>
             </TouchableOpacity>
 
             {/* Lessons List in Course */}
@@ -431,10 +431,10 @@ export const HaramainLessonsScreen: React.FC = () => {
                         color={TOKENS.colors.primary}
                       />
                       <View style={{ flex: 1 }}>
-                        <TextUI size={13} weight={isCurrent ? 'bold' : 'medium'} color={c.textPrimary} numberOfLines={1}>
+                        <TextUI variant="bodyMedium" weight={isCurrent ? 'bold' : 'medium'} color={c.textPrimary} numberOfLines={1}>
                           {lesson.number}. {lesson.titleAr}
                         </TextUI>
-                        <TextUI size={11} color={c.textSecondary}>
+                        <TextUI variant="caption" color={c.textSecondary}>
                           {lesson.duration}
                         </TextUI>
                       </View>

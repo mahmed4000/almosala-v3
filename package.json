@@ -41,6 +41,7 @@
     "build:web": "expo export --platform web",
     "build:android": "eas build --platform android --profile preview",
     "build:ios": "eas build --platform ios --profile preview",
+    "build:ios:simulator": "eas build --platform ios --profile simulator",
     "build:all": "eas build --platform all --profile production",
     "serve": "python3 -m http.server 8080",
     "lint": "expo lint"

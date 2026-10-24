@@ -84,10 +84,10 @@ export const PrayerTimesScreen: React.FC = () => {
           }}
         >
           <View style={{ flex: 1 }}>
-            <TextUI size={12} color={c.textSecondary}>
+            <TextUI variant="caption" color={c.textSecondary}>
               {t('المدينة الحالية', 'Current City')}
             </TextUI>
-            <TextUI size={17} weight="bold" color={c.textPrimary}>
+            <TextUI variant="h3" color={c.textPrimary}>
               {currentCity.nameAr}
             </TextUI>
           </View>
@@ -119,7 +119,7 @@ export const PrayerTimesScreen: React.FC = () => {
               }}
             >
               <Feather name="globe" size={14} color="#FFFFFF" />
-              <TextUI size={13} weight="bold" color="#FFFFFF">
+              <TextUI variant="captionBold" color="#FFFFFF">
                 {t('تغيير المدينة', 'Change')}
               </TextUI>
             </TouchableOpacity>
@@ -160,17 +160,17 @@ export const PrayerTimesScreen: React.FC = () => {
                   </View>
 
                   <View>
-                    <TextUI size={16} weight="bold" color={c.textPrimary}>
+                    <TextUI variant="h4" color={c.textPrimary}>
                       {p.nameAr}
                     </TextUI>
-                    <TextUI size={12} color={c.textSecondary}>
+                    <TextUI variant="caption" color={c.textSecondary}>
                       {p.note}
                     </TextUI>
                   </View>
                 </View>
 
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
-                  <TextUI size={18} weight="bold" color={TOKENS.colors.primaryDark}>
+                  <TextUI variant="h2" color={TOKENS.colors.primaryDark}>
                     {p.time}
                   </TextUI>
 

@@ -58,7 +58,7 @@ export const HomeScreen: React.FC = () => {
       <View style={{ marginBottom: 14 }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <TextUI weight="bold" size={22} color={TOKENS.colors.primaryDark}>
+            <TextUI variant="h1" color={TOKENS.colors.primaryDark}>
               {t('المصلى', 'Al-Mosala')}
             </TextUI>
             <View
@@ -72,7 +72,7 @@ export const HomeScreen: React.FC = () => {
                 borderColor: TOKENS.colors.secondary
               }}
             >
-              <TextUI size={10.5} weight="medium" color={TOKENS.colors.primaryDark}>
+              <TextUI variant="badge" weight="medium" color={TOKENS.colors.primaryDark}>
                 {t('الأندلسي', 'Pro 2026')}
               </TextUI>
             </View>
@@ -140,20 +140,20 @@ export const HomeScreen: React.FC = () => {
           <View>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginBottom: 3 }}>
               <Feather name="clock" size={13} color={TOKENS.colors.secondary} />
-              <TextUI size={12} weight="medium" color={TOKENS.colors.secondaryLight}>
+              <TextUI variant="caption" weight="medium" color={TOKENS.colors.secondaryLight}>
                 {t('الصلاة القادمة', 'Next Prayer')}
               </TextUI>
             </View>
-            <TextUI size={22} weight="bold" color="#FFFFFF">
+            <TextUI variant="h1" color="#FFFFFF">
               {nextPrayerInfo.nameAr}
             </TextUI>
           </View>
 
           <View style={{ alignItems: 'flex-end' }}>
-            <TextUI size={12} color={TOKENS.colors.secondaryLight} style={{ marginBottom: 3 }}>
+            <TextUI variant="caption" color={TOKENS.colors.secondaryLight} style={{ marginBottom: 3 }}>
               {t('موعد الأذان', 'Adhan Time')}
             </TextUI>
-            <TextUI size={18} weight="bold" color="#FFFFFF">
+            <TextUI variant="h2" color="#FFFFFF">
               {nextPrayerInfo.time}
             </TextUI>
           </View>
@@ -162,10 +162,10 @@ export const HomeScreen: React.FC = () => {
         {/* Countdown Bar */}
         <View style={{ marginTop: 12 }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5 }}>
-            <TextUI size={12} color={TOKENS.colors.secondaryLight}>
+            <TextUI variant="caption" color={TOKENS.colors.secondaryLight}>
               {t('الوقت المتبقي', 'Time Remaining')}
             </TextUI>
-            <TextUI size={14.5} weight="bold" color={TOKENS.colors.secondary}>
+            <TextUI variant="bodyLarge" weight="bold" color={TOKENS.colors.secondary}>
               {nextPrayerInfo.countdownText}
             </TextUI>
           </View>
@@ -271,7 +271,7 @@ export const HomeScreen: React.FC = () => {
       {/* 3. Daily 5 Prayers Horizontal Card Grid (Standard & Balanced) */}
       <View style={{ marginBottom: 16 }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-          <TextUI size={14.5} weight="bold" color={c.textPrimary}>
+          <TextUI variant="h4" color={c.textPrimary}>
             {t('مواقيت الصلاة اليوم', "Today's Prayer Schedule")}
           </TextUI>
           <TouchableOpacity
@@ -280,7 +280,7 @@ export const HomeScreen: React.FC = () => {
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             style={{ flexDirection: 'row', alignItems: 'center', gap: 3 }}
           >
-            <TextUI size={12} weight="medium" color={TOKENS.colors.primary}>
+            <TextUI variant="caption" weight="medium" color={TOKENS.colors.primary}>
               {t('عرض الكل', 'View All')}
             </TextUI>
             <Feather name="chevron-left" size={13} color={TOKENS.colors.primary} />
@@ -335,7 +335,7 @@ export const HomeScreen: React.FC = () => {
 
                 {/* Prayer Name */}
                 <TextUI
-                  size={12}
+                  variant="caption"
                   weight="medium"
                   color={isNext ? TOKENS.colors.primaryDark : c.textPrimary}
                   style={{ marginBottom: 2 }}
@@ -346,7 +346,7 @@ export const HomeScreen: React.FC = () => {
 
                 {/* Prayer Time */}
                 <TextUI
-                  size={12.5}
+                  variant="bodyMedium"
                   weight="bold"
                   color={isNext ? TOKENS.colors.primaryDark : c.textPrimary}
                   numberOfLines={1}
@@ -414,10 +414,10 @@ export const HomeScreen: React.FC = () => {
             <Feather name="bookmark" size={17} color={TOKENS.colors.primaryDark} />
           </View>
           <View style={{ flex: 1 }}>
-            <TextUI size={11} color={TOKENS.colors.primary}>
+            <TextUI variant="caption" color={TOKENS.colors.primary}>
               {t('متابعة القراءة من حيث توقفت', 'Continue Reading')}
             </TextUI>
-            <TextUI size={13} weight="bold" color={c.textPrimary}>
+            <TextUI variant="bodyBold" color={c.textPrimary}>
               {readingBookmark.surahName} • الآية {readingBookmark.ayah}
             </TextUI>
           </View>
@@ -427,7 +427,7 @@ export const HomeScreen: React.FC = () => {
 
       {/* 5. Islamic Features Grid (Compact, Standard, Natural Proportions) */}
       <View style={{ marginBottom: 16 }}>
-        <TextUI size={14.5} weight="bold" color={c.textPrimary} style={{ marginBottom: 10 }}>
+        <TextUI variant="h4" color={c.textPrimary} style={{ marginBottom: 10 }}>
           {t('الموسوعة والخدمات الإسلامية', 'Islamic Features & Services')}
         </TextUI>
 
@@ -464,7 +464,7 @@ export const HomeScreen: React.FC = () => {
                 <Feather name={f.icon as any} size={17} color={f.color} />
               </View>
               <View style={{ flex: 1 }}>
-                <TextUI size={12.5} weight="medium" color={c.textPrimary} numberOfLines={1}>
+                <TextUI variant="bodyMedium" weight="medium" color={c.textPrimary} numberOfLines={1}>
                   {f.titleAr}
                 </TextUI>
               </View>
@@ -486,16 +486,16 @@ export const HomeScreen: React.FC = () => {
       >
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginBottom: 6 }}>
           <Feather name="sun" size={14} color={TOKENS.colors.secondary} />
-          <TextUI size={12} weight="bold" color={TOKENS.colors.secondary}>
+          <TextUI variant="captionBold" color={TOKENS.colors.secondary}>
             {t('آية وتأمل اليوم', 'Ayah of the Day')}
           </TextUI>
         </View>
 
-        <TextUI quran size={16} weight="bold" color={TOKENS.colors.primaryDark} style={{ lineHeight: 28, textAlign: 'center', marginVertical: 6 }}>
+        <TextUI variant="quranVerse" size={16} weight="bold" color={TOKENS.colors.primaryDark} style={{ lineHeight: 28, textAlign: 'center', marginVertical: 6 }}>
           ﴿ إِنَّ ٱلَّذِينَ ءَامَنُوا۟ وَعَمِلُوا۟ ٱلصَّـٰلِحَـٰتِ سَيَجْعَلُ لَهُمُ ٱلرَّحْمَـٰنُ وُدًّۭا ﴾
         </TextUI>
 
-        <TextUI size={11} color={c.textSecondary} style={{ textAlign: 'center', marginTop: 2 }}>
+        <TextUI variant="caption" color={c.textSecondary} style={{ textAlign: 'center', marginTop: 2 }}>
           {t('سورة مريم • الآية ٩٦', 'Surah Maryam • Verse 96')}
         </TextUI>
       </View>

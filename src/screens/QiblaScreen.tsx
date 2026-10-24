@@ -112,19 +112,19 @@ export const QiblaScreen: React.FC = () => {
           }}
         >
           <View>
-            <TextUI size={12} color={c.textSecondary}>
+            <TextUI variant="caption" color={c.textSecondary}>
               {t('موقعك المباشر', 'Current Location')}
             </TextUI>
-            <TextUI size={16} weight="bold" color={c.textPrimary}>
+            <TextUI variant="h4" color={c.textPrimary}>
               {currentCity.nameAr}
             </TextUI>
           </View>
 
           <View style={{ alignItems: 'flex-end' }}>
-            <TextUI size={12} color={c.textSecondary}>
+            <TextUI variant="caption" color={c.textSecondary}>
               {t('المسافة إلى مكة', 'Distance')}
             </TextUI>
-            <TextUI size={16} weight="bold" color={TOKENS.colors.primary}>
+            <TextUI variant="h4" color={TOKENS.colors.primary}>
               {toArabicNumber(distanceKm)} {t('كم', 'km')}
             </TextUI>
           </View>

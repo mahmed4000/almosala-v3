@@ -97,7 +97,7 @@ export const QuranIndexScreen: React.FC = () => {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingVertical: 14,
+        paddingVertical: 13,
         paddingHorizontal: 16,
         marginHorizontal: 12,
         marginVertical: 4,
@@ -112,9 +112,9 @@ export const QuranIndexScreen: React.FC = () => {
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14, flex: 1 }}>
         <View
           style={{
-            width: 42,
-            height: 42,
-            borderRadius: 21,
+            width: 40,
+            height: 40,
+            borderRadius: 20,
             backgroundColor: themeMode === 'light' ? TOKENS.colors.primaryLight : '#34261E',
             alignItems: 'center',
             justifyContent: 'center',
@@ -122,16 +122,16 @@ export const QuranIndexScreen: React.FC = () => {
             borderColor: themeMode === 'light' ? '#E8DDD0' : '#453328'
           }}
         >
-          <TextUI size={13} weight="bold" color={TOKENS.colors.primary}>
+          <TextUI variant="captionBold" color={TOKENS.colors.primary}>
             {toArabicNumber(item.id)}
           </TextUI>
         </View>
 
         <View style={{ flex: 1 }}>
-          <TextUI quran size={21} weight="bold" color={c.textPrimary}>
+          <TextUI variant="h4" color={c.textPrimary}>
             سورة {item.nameAr}
           </TextUI>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 3 }}>
             <View
               style={{
                 paddingHorizontal: 6,
@@ -140,11 +140,11 @@ export const QuranIndexScreen: React.FC = () => {
                 backgroundColor: c.bgSecondary
               }}
             >
-              <TextUI size={10.5} color={c.textSecondary}>
+              <TextUI variant="badge" color={c.textSecondary}>
                 {item.type}
               </TextUI>
             </View>
-            <TextUI size={11} color={c.textSecondary}>
+            <TextUI variant="caption" color={c.textSecondary}>
               • {toArabicNumber(item.verses)} آية • صفحة {toArabicNumber(item.mushafPageStart || 1)}
             </TextUI>
           </View>
@@ -188,7 +188,7 @@ export const QuranIndexScreen: React.FC = () => {
           openReader(surah, 'page', item.startPage);
         }}
         style={{
-          paddingVertical: 15,
+          paddingVertical: 14,
           paddingHorizontal: 16,
           marginHorizontal: 12,
           marginVertical: 4,
@@ -212,24 +212,24 @@ export const QuranIndexScreen: React.FC = () => {
                 backgroundColor: themeMode === 'light' ? TOKENS.colors.primaryLight : '#34261E'
               }}
             >
-              <TextUI size={12} weight="bold" color={TOKENS.colors.primary}>
+              <TextUI variant="captionBold" color={TOKENS.colors.primary}>
                 الجزء {toArabicNumber(item.juz)}
               </TextUI>
             </View>
-            <TextUI size={11} color={c.textSecondary}>
+            <TextUI variant="caption" color={c.textSecondary}>
               يشمل الحزب {toArabicNumber(includedHizbStart)} و {toArabicNumber(includedHizbEnd)}
             </TextUI>
           </View>
 
-          <TextUI size={12.5} color={c.textSecondary} style={{ marginTop: 6 }}>
-            يبدأ من: <TextUI weight="bold" color={c.textPrimary}>سورة {item.startSurahNameAr}</TextUI> • آية {toArabicNumber(item.startAyah)}
+          <TextUI variant="caption" color={c.textSecondary} style={{ marginTop: 5 }}>
+            يبدأ من: <TextUI variant="bodyMedium" weight="bold" color={c.textPrimary}>سورة {item.startSurahNameAr}</TextUI> • آية {toArabicNumber(item.startAyah)}
           </TextUI>
         </View>
 
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <View
             style={{
-              paddingHorizontal: 10,
+              paddingHorizontal: 9,
               paddingVertical: 4,
               borderRadius: 12,
               backgroundColor: c.bgSecondary,
@@ -237,7 +237,7 @@ export const QuranIndexScreen: React.FC = () => {
               borderColor: c.border
             }}
           >
-            <TextUI size={11.5} weight="bold" color={TOKENS.colors.primary}>
+            <TextUI variant="captionBold" color={TOKENS.colors.primary}>
               ص {toArabicNumber(item.startPage)}
             </TextUI>
           </View>
@@ -282,16 +282,16 @@ export const QuranIndexScreen: React.FC = () => {
               borderColor: TOKENS.colors.secondary
             }}
           >
-            <TextUI size={11} weight="bold" color={TOKENS.colors.primary}>
+            <TextUI variant="captionBold" color={TOKENS.colors.primary}>
               الحزب {toArabicNumber(item.hizb)}
             </TextUI>
           </View>
-          <TextUI size={11} color={c.textSecondary}>
+          <TextUI variant="caption" color={c.textSecondary}>
             الجزء {toArabicNumber(item.juz)} • سورة {item.startSurahNameAr} آية {toArabicNumber(item.startAyah)}
           </TextUI>
         </View>
 
-        <TextUI quran size={18} color={c.textPrimary} numberOfLines={1}>
+        <TextUI variant="quranVerse" size={16} color={c.textPrimary} numberOfLines={1}>
           «{item.beginningSnippet}»
         </TextUI>
       </View>
@@ -307,7 +307,7 @@ export const QuranIndexScreen: React.FC = () => {
             borderColor: c.border
           }}
         >
-          <TextUI size={11} weight="bold" color={TOKENS.colors.primary}>
+          <TextUI variant="captionBold" color={TOKENS.colors.primary}>
             ص {toArabicNumber(item.startPage)}
           </TextUI>
         </View>
@@ -340,10 +340,10 @@ export const QuranIndexScreen: React.FC = () => {
       >
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-            <TextUI size={13} weight="bold" color={TOKENS.colors.primary}>
+            <TextUI variant="h4" color={TOKENS.colors.primary}>
               سورة {item.surahNameAr}
             </TextUI>
-            <TextUI size={11.5} color={c.textSecondary}>
+            <TextUI variant="caption" color={c.textSecondary}>
               • الآية {toArabicNumber(item.ayahNumber)}
             </TextUI>
           </View>
@@ -356,18 +356,18 @@ export const QuranIndexScreen: React.FC = () => {
               backgroundColor: c.bgSecondary
             }}
           >
-            <TextUI size={11} weight="bold" color={c.textSecondary}>
+            <TextUI variant="captionBold" color={c.textSecondary}>
               صفحة {toArabicNumber(item.pageNum)}
             </TextUI>
           </View>
         </View>
 
-        <TextUI quran size={18} color={c.textPrimary} style={{ lineHeight: 30 }}>
+        <TextUI variant="quranVerse" size={17} color={c.textPrimary} style={{ lineHeight: 30 }}>
           {parts.map((p, pIdx) => (
             <TextUI
               key={`part-${pIdx}`}
-              quran
-              size={18}
+              variant="quranVerse"
+              size={17}
               weight={p.isMatch ? 'bold' : 'regular'}
               color={p.isMatch ? TOKENS.colors.secondary : c.textPrimary}
               style={{
@@ -391,7 +391,7 @@ export const QuranIndexScreen: React.FC = () => {
           alignItems: 'center',
           justifyContent: 'space-between',
           paddingHorizontal: 16,
-          paddingTop: Platform.OS === 'ios' ? 60 : (Platform.OS === 'web' ? 46 : 14),
+          paddingTop: Platform.OS === 'ios' ? 56 : (Platform.OS === 'web' ? 42 : 14),
           paddingBottom: 12,
           backgroundColor: TOKENS.colors.primaryDark
         }}
@@ -402,18 +402,18 @@ export const QuranIndexScreen: React.FC = () => {
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            gap: 6,
+            gap: 5,
             paddingHorizontal: 12,
-            paddingVertical: 6,
-            borderRadius: 18,
+            paddingVertical: 5,
+            borderRadius: 16,
             backgroundColor: 'rgba(255,255,255,0.18)'
           }}
         >
-          <Feather name="arrow-right" size={17} color="#FFFFFF" />
-          <TextUI size={13} weight="bold" color="#FFFFFF">رجوع</TextUI>
+          <Feather name="arrow-right" size={15} color="#FFFFFF" />
+          <TextUI variant="captionBold" color="#FFFFFF">رجوع</TextUI>
         </TouchableOpacity>
 
-        <TextUI size={17} weight="bold" color="#FFFFFF">
+        <TextUI variant="h3" color="#FFFFFF">
           {t('فهرس المصحف الشريف', 'Holy Quran Index')}
         </TextUI>
 
@@ -424,15 +424,15 @@ export const QuranIndexScreen: React.FC = () => {
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            gap: 6,
+            gap: 5,
             paddingVertical: 4,
-            paddingHorizontal: 8,
-            borderRadius: 16,
+            paddingHorizontal: 9,
+            borderRadius: 14,
             backgroundColor: 'rgba(255,255,255,0.14)'
           }}
         >
-          <Feather name="mic" size={14} color="#FFFFFF" />
-          <TextUI size={11} color="#FFFFFF" numberOfLines={1} style={{ maxWidth: 100 }}>
+          <Feather name="mic" size={13} color="#FFFFFF" />
+          <TextUI variant="caption" color="#FFFFFF" numberOfLines={1} style={{ maxWidth: 85 }}>
             {selectedReciterData.nameAr.split(' ')[0]}
           </TextUI>
         </TouchableOpacity>
@@ -445,7 +445,7 @@ export const QuranIndexScreen: React.FC = () => {
             flexDirection: 'row',
             alignItems: 'center',
             backgroundColor: c.surface,
-            borderRadius: 24,
+            borderRadius: 22,
             paddingHorizontal: 14,
             paddingVertical: 6,
             borderWidth: 1,
@@ -454,7 +454,7 @@ export const QuranIndexScreen: React.FC = () => {
             ...makeShadow('0 2px 6px rgba(0,0,0,0.04)', '#000', 0.04, 3)
           }}
         >
-          <Feather name="search" size={18} color={TOKENS.colors.primary} />
+          <Feather name="search" size={17} color={TOKENS.colors.primary} />
           <TextInput
             placeholder="ابحث باسم السورة، كلمة بالآية، رقم صفحة (١-٦٠٤)، أو حزب..."
             placeholderTextColor={c.textSecondary}
@@ -464,7 +464,7 @@ export const QuranIndexScreen: React.FC = () => {
               flex: 1,
               color: c.textPrimary,
               textAlign: 'right',
-              fontSize: 13.5,
+              fontSize: 13,
               paddingVertical: 2
             }}
           />
@@ -493,17 +493,17 @@ export const QuranIndexScreen: React.FC = () => {
             }}
           >
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-              <Feather name="book-open" size={18} color={TOKENS.colors.primary} />
+              <Feather name="book-open" size={17} color={TOKENS.colors.primary} />
               <View>
-                <TextUI size={13} weight="bold" color={TOKENS.colors.primaryDark}>
+                <TextUI variant="bodyBold" color={TOKENS.colors.primaryDark}>
                   انتقال مباشر إلى الصفحة {toArabicNumber(searchResults.pageNumber!)}
                 </TextUI>
-                <TextUI size={10.5} color={c.textSecondary}>
+                <TextUI variant="caption" color={c.textSecondary}>
                   اضغط لفتح صفحة المصحف مباشرة
                 </TextUI>
               </View>
             </View>
-            <Feather name="arrow-left" size={18} color={TOKENS.colors.primary} />
+            <Feather name="arrow-left" size={17} color={TOKENS.colors.primary} />
           </TouchableOpacity>
         )}
 
@@ -538,10 +538,10 @@ export const QuranIndexScreen: React.FC = () => {
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
               <Feather name="bookmark" size={16} color={TOKENS.colors.primary} />
               <View>
-                <TextUI size={10.5} color={c.textSecondary}>
+                <TextUI variant="caption" color={c.textSecondary}>
                   متابعة القراءة من آخر موضع:
                 </TextUI>
-                <TextUI size={12.5} weight="bold" color={TOKENS.colors.primaryDark}>
+                <TextUI variant="bodyBold" color={TOKENS.colors.primaryDark}>
                   سورة {readingBookmark.surahName} • آية {toArabicNumber(readingBookmark.ayah)} • ص {toArabicNumber(readingBookmark.page)}
                 </TextUI>
               </View>
@@ -583,7 +583,7 @@ export const QuranIndexScreen: React.FC = () => {
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: 6,
-                    paddingVertical: 8,
+                    paddingVertical: 7,
                     borderRadius: 11,
                     backgroundColor: active ? c.surface : 'transparent',
                     borderWidth: active ? 1 : 0,
@@ -591,7 +591,7 @@ export const QuranIndexScreen: React.FC = () => {
                   }}
                 >
                   <TextUI
-                    size={13}
+                    variant="bodyMedium"
                     weight={active ? 'bold' : 'regular'}
                     color={active ? TOKENS.colors.primary : c.textSecondary}
                   >
@@ -606,8 +606,7 @@ export const QuranIndexScreen: React.FC = () => {
                     }}
                   >
                     <TextUI
-                      size={10}
-                      weight="bold"
+                      variant="badge"
                       color={active ? TOKENS.colors.primary : c.textSecondary}
                     >
                       {tab.count}
@@ -630,7 +629,7 @@ export const QuranIndexScreen: React.FC = () => {
           {/* Matched Surahs */}
           {searchResults && searchResults.matchedSurahs.length > 0 && (
             <View style={{ marginBottom: 14 }}>
-              <TextUI size={12} weight="bold" color={c.textSecondary} style={{ marginHorizontal: 16, marginBottom: 6 }}>
+              <TextUI variant="captionBold" color={c.textSecondary} style={{ marginHorizontal: 16, marginBottom: 6 }}>
                 السور المطابقة ({toArabicNumber(searchResults.matchedSurahs.length)})
               </TextUI>
               {searchResults.matchedSurahs.map((surah) => (
@@ -644,7 +643,7 @@ export const QuranIndexScreen: React.FC = () => {
           {/* Matched Ahzab */}
           {searchResults && searchResults.matchedHizb.length > 0 && (
             <View style={{ marginBottom: 14 }}>
-              <TextUI size={12} weight="bold" color={c.textSecondary} style={{ marginHorizontal: 16, marginBottom: 6 }}>
+              <TextUI variant="captionBold" color={c.textSecondary} style={{ marginHorizontal: 16, marginBottom: 6 }}>
                 الأحزاب المطابقة ({toArabicNumber(searchResults.matchedHizb.length)})
               </TextUI>
               {searchResults.matchedHizb.map((hizb) => (
@@ -658,7 +657,7 @@ export const QuranIndexScreen: React.FC = () => {
           {/* Matched Verses with Highlighting */}
           {searchResults && searchResults.matchedVerses.length > 0 && (
             <View style={{ marginBottom: 14 }}>
-              <TextUI size={12} weight="bold" color={c.textSecondary} style={{ marginHorizontal: 16, marginBottom: 6 }}>
+              <TextUI variant="captionBold" color={c.textSecondary} style={{ marginHorizontal: 16, marginBottom: 6 }}>
                 الآيات الكريمة المطابقة ({toArabicNumber(searchResults.matchedVerses.length)})
               </TextUI>
               {searchResults.matchedVerses.map((verse, vIdx) => (

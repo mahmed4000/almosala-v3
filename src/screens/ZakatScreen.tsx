@@ -86,7 +86,7 @@ export const ZakatScreen: React.FC = () => {
             backgroundColor: activeTab === 'calculator' ? TOKENS.colors.primary : 'transparent'
           }}
         >
-          <TextUI size={13} weight="bold" color={activeTab === 'calculator' ? '#FFFFFF' : c.textPrimary}>
+          <TextUI variant="captionBold" color={activeTab === 'calculator' ? '#FFFFFF' : c.textPrimary}>
             💰 زكاة الأموال والذهب
           </TextUI>
         </TouchableOpacity>
@@ -105,7 +105,7 @@ export const ZakatScreen: React.FC = () => {
             backgroundColor: activeTab === 'fitr' ? TOKENS.colors.primary : 'transparent'
           }}
         >
-          <TextUI size={13} weight="bold" color={activeTab === 'fitr' ? '#FFFFFF' : c.textPrimary}>
+          <TextUI variant="captionBold" color={activeTab === 'fitr' ? '#FFFFFF' : c.textPrimary}>
             🌾 زكاة الفطر
           </TextUI>
         </TouchableOpacity>
@@ -123,25 +123,25 @@ export const ZakatScreen: React.FC = () => {
               style={{
                 backgroundColor: reachesNisab ? TOKENS.colors.primaryDark : c.surface,
                 borderRadius: 20,
-                padding: 20,
+                padding: 18,
                 marginBottom: 20,
                 borderWidth: 1,
                 borderColor: reachesNisab ? TOKENS.colors.primaryDark : c.border,
                 ...makeShadow('0 8px 24px rgba(0,0,0,0.06)', '#000', 0.06, 6)
               }}
             >
-              <TextUI size={13} color={reachesNisab ? TOKENS.colors.secondaryLight : c.textSecondary}>
+              <TextUI variant="caption" color={reachesNisab ? TOKENS.colors.secondaryLight : c.textSecondary}>
                 {t('مقدار الزكاة الواجبة شرعاً (٢.٥٪)', 'Total Zakat Due (2.5%)')}
               </TextUI>
-              <TextUI size={32} weight="bold" color={reachesNisab ? '#FFFFFF' : TOKENS.colors.primaryDark} style={{ marginVertical: 6 }}>
+              <TextUI variant="h1" size={26} color={reachesNisab ? '#FFFFFF' : TOKENS.colors.primaryDark} style={{ marginVertical: 6 }}>
                 {toArabicNumber(zakatDue.toLocaleString('en-US', { maximumFractionDigits: 2 }))}
               </TextUI>
 
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 8, paddingTop: 10, borderTopWidth: 1, borderColor: reachesNisab ? 'rgba(255,255,255,0.15)' : c.border }}>
-                <TextUI size={12} color={reachesNisab ? TOKENS.colors.secondaryLight : c.textSecondary}>
+                <TextUI variant="caption" color={reachesNisab ? TOKENS.colors.secondaryLight : c.textSecondary}>
                   {reachesNisab ? '✅ بلغ النصاب وحال عليه الحول' : '⚠️ لم يبلغ النصاب الشرعي'}
                 </TextUI>
-                <TextUI size={12} color={reachesNisab ? TOKENS.colors.secondaryLight : c.textSecondary}>
+                <TextUI variant="caption" color={reachesNisab ? TOKENS.colors.secondaryLight : c.textSecondary}>
                   النصاب: {toArabicNumber(Math.round(nisabValue))}
                 </TextUI>
               </View>

@@ -123,9 +123,8 @@ export const AzkarSessionScreen: React.FC = () => {
           }}
         >
           <TextUI
-            quran
+            variant="quranVerse"
             size={20}
-            weight="bold"
             color={c.textPrimary}
             style={{ lineHeight: 36, textAlign: 'center', marginBottom: 16 }}
           >
@@ -144,7 +143,7 @@ export const AzkarSessionScreen: React.FC = () => {
                 borderColor: TOKENS.colors.secondary
               }}
             >
-              <TextUI size={12} color={TOKENS.colors.primaryDark} style={{ textAlign: 'center', lineHeight: 18 }}>
+              <TextUI variant="caption" color={TOKENS.colors.primaryDark} style={{ textAlign: 'center', lineHeight: 18 }}>
                 ✨ {currentItem.virtue}
               </TextUI>
             </View>

@@ -960,39 +960,89 @@ export const QuranReaderScreen: React.FC = () => {
     });
   };
 
+  const renderAyahMarker = (arabicNumber: string, isPlaying: boolean = false, verse?: QuranVerse) => {
+    const badgeSize = Math.max(26, Math.round(quranFontSize * 1.15));
+    const rosetteSize = Math.round(badgeSize * 1.16);
+    const numSize = arabicNumber.length > 2
+      ? Math.max(8, Math.round(badgeSize * 0.32))
+      : Math.max(9.5, Math.round(badgeSize * 0.40));
+
+    return (
+      <TouchableOpacity
+        key={verse ? `ayah-marker-${verse.surahId}-${verse.ayahNumber}` : undefined}
+        activeOpacity={0.7}
+        onPress={(event) => {
+          if (verse) {
+            event?.stopPropagation?.();
+            handleOpenAyahAction(verse);
+          }
+        }}
+        accessibilityRole="button"
+        accessibilityLabel={`آية ${arabicNumber}`}
+        style={{
+          width: badgeSize,
+          height: badgeSize,
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginHorizontal: 3,
+        }}
+      >
+        <Text
+          style={{
+            position: 'absolute',
+            fontFamily: 'Amiri_400Regular',
+            fontSize: rosetteSize,
+            color: isPlaying ? TOKENS.colors.primaryDark : TOKENS.colors.primary,
+            textAlign: 'center',
+            includeFontPadding: false,
+          }}
+        >
+          ۝
+        </Text>
+        <Text
+          style={{
+            fontFamily: 'Tajawal_700Bold',
+            fontSize: numSize,
+            color: isPlaying ? TOKENS.colors.primaryDark : c.textPrimary,
+            textAlign: 'center',
+            includeFontPadding: false,
+            paddingTop: Platform.OS === 'ios' ? 1.5 : 0,
+          }}
+        >
+          {arabicNumber}
+        </Text>
+      </TouchableOpacity>
+    );
+  };
+
   const renderVerse = (verse: QuranVerse) => {
     const isPlaying = playingAyahNum === verse.ayahNumber && playingSurahId === verse.surahId;
     const isMarked = (readingBookmark?.surahId === verse.surahId && readingBookmark?.ayah === verse.ayahNumber) ||
       (Number(screenParams?.startSurahId) === verse.surahId && Number(screenParams?.startAyah) === verse.ayahNumber);
     return (
-      <TextUI
-        key={`v-${verse.surahId}-${verse.ayahNumber}`}
-        quran
-        size={quranFontSize}
-        onPress={(event) => { event?.stopPropagation?.(); handleOpenAyahAction(verse); }}
-        align="center"
-        style={{
-          textAlign: quranTextAlign,
-          backgroundColor: isPlaying
-            ? 'rgba(198, 146, 85, 0.35)'
-            : isMarked
-            ? 'rgba(212, 163, 115, 0.25)'
-            : undefined
-        }}
-      >
-        {isMarked ? ' 🔖 ' : ''}
-        {tajweedTexts[`${verse.surahId}-${verse.ayahNumber}`]
-          ? renderTajweedText(tajweedTexts[`${verse.surahId}-${verse.ayahNumber}`], `v-${verse.surahId}-${verse.ayahNumber}`)
-          : verse.text}
-        <TextUI
-          quran
-          size={Math.round(quranFontSize * 0.92)}
-          weight="bold"
-          color={isPlaying ? TOKENS.colors.primaryDark : TOKENS.colors.primary}
+      <React.Fragment key={`v-${verse.surahId}-${verse.ayahNumber}`}>
+        <Text
+          onPress={(event) => { event?.stopPropagation?.(); handleOpenAyahAction(verse); }}
+          style={{
+            fontFamily: 'Amiri_400Regular',
+            fontSize: quranFontSize,
+            color: c.textPrimary,
+            backgroundColor: isPlaying
+              ? 'rgba(198, 146, 85, 0.35)'
+              : isMarked
+              ? 'rgba(212, 163, 115, 0.25)'
+              : undefined
+          }}
         >
-          {` ۝${verse.arabicNumber} `}
-        </TextUI>
-      </TextUI>
+          {isMarked ? ' 🔖 ' : ''}
+          {tajweedTexts[`${verse.surahId}-${verse.ayahNumber}`]
+            ? renderTajweedText(tajweedTexts[`${verse.surahId}-${verse.ayahNumber}`], `v-${verse.surahId}-${verse.ayahNumber}`)
+            : verse.text}
+        </Text>
+        {' '}
+        {renderAyahMarker(verse.arabicNumber, isPlaying, verse)}
+        {' '}
+      </React.Fragment>
     );
   };
 
@@ -1167,7 +1217,7 @@ export const QuranReaderScreen: React.FC = () => {
               onPress={() => openJump('page')}
               style={{ paddingHorizontal: 8, paddingVertical: 5, borderRadius: 8, backgroundColor: c.surface, borderWidth: 1, borderColor: c.border }}
             >
-              <TextUI quran size={14} weight="bold" color={c.textPrimary}>
+              <TextUI variant="captionBold" color={c.textPrimary}>
                 سورة {currentSurah.nameAr} • ص {toArabicNumber(activePage)}
               </TextUI>
             </TouchableOpacity>
@@ -1196,17 +1246,17 @@ export const QuranReaderScreen: React.FC = () => {
         <View style={{ paddingHorizontal: 8, paddingVertical: 5, backgroundColor: c.bgSecondary, borderBottomWidth: 1, borderColor: c.border }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
             <TouchableOpacity onPress={() => openJump('surah')} style={{ flex: 1.15, alignItems: 'center', paddingHorizontal: 5, paddingVertical: 7, borderRadius: 8, backgroundColor: c.surface, borderWidth: 1, borderColor: c.border }}>
-              <TextUI quran size={16} weight="bold" color={c.textPrimary} numberOfLines={1}>سورة {currentSurah.nameAr}</TextUI>
+              <TextUI variant="bodyMedium" weight="bold" color={c.textPrimary} numberOfLines={1}>سورة {currentSurah.nameAr}</TextUI>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => openJump('page')} style={{ minWidth: 58, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4, paddingVertical: 6 }}>
-              <TextUI quran size={20} weight="bold" color={c.textPrimary}>{toArabicNumber(activePage)}</TextUI>
+              <TextUI variant="h4" color={c.textPrimary}>{toArabicNumber(activePage)}</TextUI>
             </TouchableOpacity>
             {readingMode === 'page' ? <View style={{ flexDirection: 'row', gap: 2 }}>
               <TouchableOpacity accessibilityLabel="الصفحة السابقة" onPress={() => movePage(-1)} disabled={activePage <= 1} style={{ width: 30, height: 34, alignItems: 'center', justifyContent: 'center', opacity: activePage <= 1 ? 0.35 : 1 }}><Feather name="chevron-right" size={20} color={c.textPrimary} /></TouchableOpacity>
               <TouchableOpacity accessibilityLabel="الصفحة التالية" onPress={() => movePage(1)} disabled={activePage >= QURAN_PAGE_INDEX.length} style={{ width: 30, height: 34, alignItems: 'center', justifyContent: 'center', opacity: activePage >= QURAN_PAGE_INDEX.length ? 0.35 : 1 }}><Feather name="chevron-left" size={20} color={c.textPrimary} /></TouchableOpacity>
             </View> : null}
             <TouchableOpacity onPress={() => openJump('juz')} style={{ flex: 1.05, alignItems: 'center', paddingHorizontal: 5, paddingVertical: 7, borderRadius: 8, backgroundColor: c.surface, borderWidth: 1, borderColor: c.border }}>
-              <TextUI quran size={16} weight="bold" color={c.textPrimary}>الجزء {toArabicNumber(pageItem.juzNumbers[0] || 1)}</TextUI>
+              <TextUI variant="bodyMedium" weight="bold" color={c.textPrimary}>الجزء {toArabicNumber(pageItem.juzNumbers[0] || 1)}</TextUI>
             </TouchableOpacity>
           </View>
         </View>
@@ -1215,9 +1265,9 @@ export const QuranReaderScreen: React.FC = () => {
       <Modal visible={jumpModalVisible} transparent animationType="fade" onRequestClose={() => setJumpModalVisible(false)}>
         <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.48)', justifyContent: 'center', padding: 22 }}>
           <View style={{ backgroundColor: c.surface, borderRadius: 18, padding: 18, borderWidth: 1, borderColor: c.border }}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}><TextUI size={17} weight="bold" color={c.textPrimary}>الانتقال إلى موضع</TextUI><TouchableOpacity onPress={() => setJumpModalVisible(false)}><Feather name="x" size={20} color={c.textPrimary} /></TouchableOpacity></View>
-            <View style={{ flexDirection: 'row', gap: 6, marginTop: 14 }}>{([{ id: 'surah', label: 'سورة' }, { id: 'juz', label: 'جزء' }, { id: 'page', label: 'صفحة' }] as const).map((item) => <TouchableOpacity key={item.id} onPress={() => { setJumpType(item.id); setJumpValue(''); }} style={{ flex: 1, alignItems: 'center', paddingVertical: 9, borderRadius: 9, backgroundColor: jumpType === item.id ? TOKENS.colors.primary : c.bgSecondary }}><TextUI size={12} weight="bold" color={jumpType === item.id ? '#FFFFFF' : c.textPrimary}>{item.label}</TextUI></TouchableOpacity>)}</View>
-            {jumpType === 'page' ? <View><TextInput value={jumpValue} onChangeText={setJumpValue} keyboardType="number-pad" placeholder="رقم الصفحة ١ – ٦٠٤" placeholderTextColor={c.textSecondary} style={{ marginTop: 13, padding: 12, borderRadius: 10, borderWidth: 1, borderColor: c.border, color: c.textPrimary, textAlign: 'center', fontSize: 18 }} /><TouchableOpacity onPress={executeJump} disabled={!jumpValue.trim()} style={{ marginTop: 11, backgroundColor: TOKENS.colors.primary, padding: 12, borderRadius: 10, alignItems: 'center', opacity: jumpValue.trim() ? 1 : 0.45 }}><TextUI size={13} weight="bold" color="#FFFFFF">انتقال للصفحة</TextUI></TouchableOpacity></View> : <ScrollView style={{ maxHeight: 420, marginTop: 9 }} keyboardShouldPersistTaps="handled"><View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 7 }}>{jumpType === 'surah' ? QURAN_DATA.map((surah: any) => <TouchableOpacity key={`surah-${surah.id}`} onPress={() => { setSelectedSurah(surah); goToPage(surah.mushafPageStart || 1); setReadingMode('page'); setJumpModalVisible(false); }} style={{ width: '48%', minHeight: 42, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7, padding: 6, borderRadius: 9, backgroundColor: c.bgSecondary, borderWidth: 1, borderColor: c.border }}><TextUI size={11} color={c.textSecondary}>{toArabicNumber(surah.id)}</TextUI><TextUI quran size={17} color={c.textPrimary} numberOfLines={1}>{surah.nameAr}</TextUI></TouchableOpacity>) : QURAN_JUZ_INDEX.map((juz) => <TouchableOpacity key={`juz-${juz.juz}`} onPress={() => { const target = QURAN_DATA.find((surah: any) => surah.id === juz.startSurahId); if (target) setSelectedSurah(target); goToPage(juz.startPage); setReadingMode('page'); setJumpModalVisible(false); }} style={{ width: '48%', minHeight: 42, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7, padding: 6, borderRadius: 9, backgroundColor: c.bgSecondary, borderWidth: 1, borderColor: c.border }}><TextUI size={11} color={c.textSecondary}>{toArabicNumber(juz.juz)}</TextUI><TextUI quran size={16} color={c.textPrimary}>الجزء {toArabicNumber(juz.juz)}</TextUI></TouchableOpacity>)}</View></ScrollView>}
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}><TextUI variant="h4" color={c.textPrimary}>الانتقال إلى موضع</TextUI><TouchableOpacity onPress={() => setJumpModalVisible(false)}><Feather name="x" size={20} color={c.textPrimary} /></TouchableOpacity></View>
+            <View style={{ flexDirection: 'row', gap: 6, marginTop: 14 }}>{([{ id: 'surah', label: 'سورة' }, { id: 'juz', label: 'جزء' }, { id: 'page', label: 'صفحة' }] as const).map((item) => <TouchableOpacity key={item.id} onPress={() => { setJumpType(item.id); setJumpValue(''); }} style={{ flex: 1, alignItems: 'center', paddingVertical: 9, borderRadius: 9, backgroundColor: jumpType === item.id ? TOKENS.colors.primary : c.bgSecondary }}><TextUI variant="badge" color={jumpType === item.id ? '#FFFFFF' : c.textPrimary}>{item.label}</TextUI></TouchableOpacity>)}</View>
+            {jumpType === 'page' ? <View><TextInput value={jumpValue} onChangeText={setJumpValue} keyboardType="number-pad" placeholder="رقم الصفحة ١ – ٦٠٤" placeholderTextColor={c.textSecondary} style={{ marginTop: 13, padding: 12, borderRadius: 10, borderWidth: 1, borderColor: c.border, color: c.textPrimary, textAlign: 'center', fontSize: 16 }} /><TouchableOpacity onPress={executeJump} disabled={!jumpValue.trim()} style={{ marginTop: 11, backgroundColor: TOKENS.colors.primary, padding: 12, borderRadius: 10, alignItems: 'center', opacity: jumpValue.trim() ? 1 : 0.45 }}><TextUI variant="badge" color="#FFFFFF">انتقال للصفحة</TextUI></TouchableOpacity></View> : <ScrollView style={{ maxHeight: 420, marginTop: 9 }} keyboardShouldPersistTaps="handled"><View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 7 }}>{jumpType === 'surah' ? QURAN_DATA.map((surah: any) => <TouchableOpacity key={`surah-${surah.id}`} onPress={() => { setSelectedSurah(surah); goToPage(surah.mushafPageStart || 1); setReadingMode('page'); setJumpModalVisible(false); }} style={{ width: '48%', minHeight: 42, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7, padding: 6, borderRadius: 9, backgroundColor: c.bgSecondary, borderWidth: 1, borderColor: c.border }}><TextUI variant="caption" color={c.textSecondary}>{toArabicNumber(surah.id)}</TextUI><TextUI variant="bodyMedium" weight="bold" color={c.textPrimary} numberOfLines={1}>{surah.nameAr}</TextUI></TouchableOpacity>) : QURAN_JUZ_INDEX.map((juz) => <TouchableOpacity key={`juz-${juz.juz}`} onPress={() => { const target = QURAN_DATA.find((surah: any) => surah.id === juz.startSurahId); if (target) setSelectedSurah(target); goToPage(juz.startPage); setReadingMode('page'); setJumpModalVisible(false); }} style={{ width: '48%', minHeight: 42, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7, padding: 6, borderRadius: 9, backgroundColor: c.bgSecondary, borderWidth: 1, borderColor: c.border }}><TextUI variant="caption" color={c.textSecondary}>{toArabicNumber(juz.juz)}</TextUI><TextUI variant="bodyMedium" weight="bold" color={c.textPrimary}>الجزء {toArabicNumber(juz.juz)}</TextUI></TouchableOpacity>)}</View></ScrollView>}
           </View>
         </View>
       </Modal>
@@ -1430,14 +1480,8 @@ export const QuranReaderScreen: React.FC = () => {
                         style={{ lineHeight: Math.round(quranFontSize * 2), textAlign: 'center' }}
                       >
                         {verse.text}
-                        <TextUI
-                          quran
-                          size={Math.round(quranFontSize * 0.92)}
-                          weight="bold"
-                          color={isPlaying ? TOKENS.colors.primaryDark : TOKENS.colors.primary}
-                        >
-                          {` ۝${verse.arabicNumber} `}
-                        </TextUI>
+                        {' '}
+                        {renderAyahMarker(verse.arabicNumber, isPlaying, verse)}
                       </TextUI>
                     </View>
 
@@ -2191,7 +2235,8 @@ export const QuranReaderScreen: React.FC = () => {
             {/* Ayah Card */}
             <View style={{ backgroundColor: c.surface, borderRadius: 16, padding: 12, borderWidth: 1, borderColor: c.border, marginBottom: 10 }}>
               <TextUI quran size={17} color={c.textPrimary} style={{ textAlign: 'center', lineHeight: 29 }}>
-                ﴿ {activeAyah?.text} ﴾ {activeAyah?.badge || `۝${toArabicNumber(activeAyah?.ayahNumber || 1)}`}
+                ﴿ {activeAyah?.text} ﴾{' '}
+                {activeAyah ? renderAyahMarker(toArabicNumber(activeAyah.ayahNumber), false, activeAyah) : null}
               </TextUI>
 
               {/* Action Toolbar */}
