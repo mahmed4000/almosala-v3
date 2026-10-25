@@ -128,6 +128,7 @@ export const QuranReaderScreen: React.FC = () => {
   const [autoScroll, setAutoScroll] = useState(false);
   const [scrollSpeedIndex, setScrollSpeedIndex] = useState(1);
   const [readerControlsVisible, setReaderControlsVisible] = useState(false);
+  const [isImmersive, setIsImmersive] = useState(false);
   const [jumpModalVisible, setJumpModalVisible] = useState(false);
   const [jumpType, setJumpType] = useState<JumpType>('page');
   const [jumpValue, setJumpValue] = useState('');
@@ -994,14 +995,15 @@ export const QuranReaderScreen: React.FC = () => {
     ));
   };
 
-  const renderAyahMarker = (arabicNumber: string, isPlaying: boolean = false, verse?: QuranVerse) => {
+  const renderAyahMarker = (arabicNumber: string, isPlaying: boolean = false, verse?: QuranVerse, customFontSize?: number) => {
+    const effectiveSize = customFontSize || quranFontSize;
     if (Platform.OS === 'ios') {
       return (
         <Text
           key={verse ? `ayah-marker-${verse.surahId}-${verse.ayahNumber}` : undefined}
           style={{
             fontFamily: 'Amiri_700Bold',
-            fontSize: Math.round(quranFontSize * 0.95),
+            fontSize: Math.round(effectiveSize * 0.95),
             color: isPlaying ? TOKENS.colors.primaryDark : TOKENS.colors.primary,
           }}
         >
@@ -1010,12 +1012,12 @@ export const QuranReaderScreen: React.FC = () => {
       );
     }
 
-    // On Web (localhost): preserved exactly as calibrated for browser rendering
-    const badgeSize = Math.max(28, Math.round(quranFontSize * 1.2));
+    // On Web (localhost): preserved exactly as calibrated for browser rendering, scaled to effectiveSize
+    const badgeSize = Math.max(20, Math.round(effectiveSize * 1.2));
     const rosetteSize = Math.round(badgeSize * 1.15);
     const numSize = arabicNumber.length > 2
-      ? Math.max(8.5, Math.round(badgeSize * 0.34))
-      : Math.max(10.5, Math.round(badgeSize * 0.44));
+      ? Math.max(7.5, Math.round(badgeSize * 0.34))
+      : Math.max(9.5, Math.round(badgeSize * 0.44));
 
     return (
       <View
@@ -1127,7 +1129,43 @@ export const QuranReaderScreen: React.FC = () => {
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <View style={{ minHeight: Platform.OS === 'ios' ? 98 : 54, paddingHorizontal: 12, paddingTop: Platform.OS === 'ios' ? 60 : (Platform.OS === 'web' ? 46 : 14), paddingBottom: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: c.surface, borderBottomWidth: 1, borderColor: c.border }}>
+      {isImmersive && (
+        <TouchableOpacity
+          activeOpacity={0.85}
+          onPress={() => {
+            triggerHaptic('light');
+            setIsImmersive(false);
+          }}
+          style={{
+            position: 'absolute',
+            top: Platform.OS === 'ios' ? 52 : 20,
+            alignSelf: 'center',
+            zIndex: 99,
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 6,
+            backgroundColor: themeMode === 'light' ? 'rgba(255, 255, 255, 0.94)' : 'rgba(38, 30, 24, 0.94)',
+            paddingHorizontal: 14,
+            paddingVertical: 7,
+            borderRadius: 20,
+            borderWidth: 1,
+            borderColor: c.border,
+            ...makeShadow('0 2px 10px rgba(0,0,0,0.1)', '#000', 0.1, 4)
+          }}
+        >
+          <Feather name="minimize-2" size={13} color={TOKENS.colors.primary} />
+          <TextUI size={12} weight="bold" color={c.textPrimary}>
+            سورة {currentSurah.nameAr} • ص {toArabicNumber(activePage)}
+          </TextUI>
+          <TextUI size={10.5} color={c.textSecondary}>
+            (انقر للخروج)
+          </TextUI>
+        </TouchableOpacity>
+      )}
+
+      {!isImmersive && (
+        <>
+          <View style={{ minHeight: Platform.OS === 'ios' ? 98 : 54, paddingHorizontal: 12, paddingTop: Platform.OS === 'ios' ? 60 : (Platform.OS === 'web' ? 46 : 14), paddingBottom: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: c.surface, borderBottomWidth: 1, borderColor: c.border }}>
         {/* زر رجوع واضح وكبير بالاسم والأيقونة */}
         <TouchableOpacity 
           onPress={goBack} 
@@ -1243,6 +1281,25 @@ export const QuranReaderScreen: React.FC = () => {
           >
             <Feather name="mic" size={14} color={TOKENS.colors.primary} />
           </TouchableOpacity>
+
+          {/* Immersive Mode Button */}
+          <TouchableOpacity 
+            onPress={() => { triggerHaptic('light'); setIsImmersive(true); }} 
+            accessibilityLabel="وضع القراءة الغامر بدون مشتتات" 
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: 16,
+              backgroundColor: c.bgSecondary,
+              borderWidth: 1,
+              borderColor: c.border,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <Feather name="maximize-2" size={13} color={TOKENS.colors.primary} />
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -1320,6 +1377,8 @@ export const QuranReaderScreen: React.FC = () => {
           </View>
         </View>
       )}
+      </>
+      )}
 
       <Modal visible={jumpModalVisible} transparent animationType="fade" onRequestClose={() => setJumpModalVisible(false)}>
         <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.48)', justifyContent: 'center', padding: 22 }}>
@@ -1355,7 +1414,7 @@ export const QuranReaderScreen: React.FC = () => {
         <ScrollView
         ref={scrollViewRef}
         style={{ flex: 1 }}
-        contentContainerStyle={{ paddingHorizontal: 3, paddingTop: 0, paddingBottom: (isAudioPlaying || isAudioLoading || playingAyahNum != null || readerControlsVisible || autoScroll) ? 180 : 16, flexGrow: 1 }}
+        contentContainerStyle={{ paddingHorizontal: 3, paddingTop: isImmersive ? (Platform.OS === 'ios' ? 44 : 20) : 0, paddingBottom: (isAudioPlaying || isAudioLoading || playingAyahNum != null || readerControlsVisible || autoScroll) ? 180 : 16, flexGrow: 1 }}
         showsVerticalScrollIndicator={false}
         scrollEventThrottle={16}
         onTouchStart={handleReaderTouchStart}
@@ -1363,7 +1422,13 @@ export const QuranReaderScreen: React.FC = () => {
         onTouchEnd={handleReaderTouchEnd}
         onTouchCancel={handleReaderTouchEnd}
         onStartShouldSetResponderCapture={(event) => event.target === event.currentTarget}
-        onResponderRelease={() => setReaderControlsVisible((visible) => !visible)}
+        onResponderRelease={() => {
+          if (isImmersive) {
+            setIsImmersive(false);
+          } else {
+            setReaderControlsVisible((visible) => !visible);
+          }
+        }}
         onScroll={(event) => {
           const offset = event.nativeEvent.contentOffset.y;
           scrollOffsetRef.current = offset;
@@ -2292,10 +2357,10 @@ export const QuranReaderScreen: React.FC = () => {
             </View>
 
             {/* Ayah Card */}
-            <View style={{ backgroundColor: c.surface, borderRadius: 16, padding: 12, borderWidth: 1, borderColor: c.border, marginBottom: 10 }}>
-              <TextUI quran size={17} color={c.textPrimary} style={{ textAlign: 'center', lineHeight: 29 }}>
-                ﴿ {activeAyah?.text} ﴾{' '}
-                {activeAyah ? renderAyahMarker(toArabicNumber(activeAyah.ayahNumber), false, activeAyah) : null}
+            <View style={{ backgroundColor: c.surface, borderRadius: 16, padding: 14, borderWidth: 1, borderColor: c.border, marginBottom: 10 }}>
+              <TextUI quran size={18} color={c.textPrimary} style={{ textAlign: 'center', lineHeight: 32 }}>
+                {activeAyah?.text}{' '}
+                {activeAyah ? renderAyahMarker(toArabicNumber(activeAyah.ayahNumber), false, activeAyah, 18) : null}
               </TextUI>
 
               {/* Action Toolbar */}

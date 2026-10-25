@@ -6,6 +6,8 @@ import { TextUI } from '../components/common/TextUI';
 import { MoorishArchFrame } from '../components/common/MoorishArchFrame';
 import { TOKENS, makeShadow } from '../constants/tokens';
 import { getFullDateInfo } from '../services/hijriDate';
+import { toArabicNumber } from '../services/prayerCalculation';
+import { AZKAR_CATEGORIES } from '../data/azkarData';
 
 export const HomeScreen: React.FC = () => {
   const {
@@ -19,7 +21,8 @@ export const HomeScreen: React.FC = () => {
     prayerBells,
     togglePrayerBell,
     readingBookmark,
-    refreshLocation
+    refreshLocation,
+    triggerHaptic
   } = useApp();
 
   const c = theme;
@@ -384,89 +387,282 @@ export const HomeScreen: React.FC = () => {
         </View>
       </View>
 
-      {/* 4. Reading Bookmark Resume Banner (if available) */}
-      {readingBookmark && (
-        <TouchableOpacity
-          activeOpacity={0.88}
-          onPress={() => navigate('quran_reader', { surahId: readingBookmark.surahId, ayah: readingBookmark.ayah })}
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            backgroundColor: themeMode === 'light' ? '#FFF9F2' : '#2D231C',
-            borderRadius: 14,
-            paddingVertical: 10,
-            paddingHorizontal: 12,
-            marginBottom: 16,
-            borderWidth: 1,
-            borderColor: TOKENS.colors.secondary
-          }}
-        >
-          <View
+      {/* 3.5. Daily Azkar Quick Access (Morning & Evening) */}
+      <View style={{ marginBottom: 16 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <Feather name="sun" size={15} color={TOKENS.colors.primary} />
+            <TextUI variant="h4" color={c.textPrimary}>
+              {t('الورد اليومي', 'Daily Azkar')}
+            </TextUI>
+          </View>
+          <TouchableOpacity
+            onPress={() => navigate('azkar_categories')}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <TextUI size={12} weight="bold" color={TOKENS.colors.primary}>
+              {t('جميع الأذكار ←', 'All Azkar ←')}
+            </TextUI>
+          </TouchableOpacity>
+        </View>
+
+        <View style={{ flexDirection: 'row', gap: 10 }}>
+          {/* Morning Azkar Quick Card */}
+          <TouchableOpacity
+            activeOpacity={0.82}
+            onPress={() => {
+              triggerHaptic?.('light');
+              const morningCat = AZKAR_CATEGORIES.find((cat) => cat.id === 'morning') || AZKAR_CATEGORIES[0];
+              navigate('azkar_session', { category: morningCat });
+            }}
             style={{
-              width: 34,
-              height: 34,
-              borderRadius: 17,
-              backgroundColor: TOKENS.colors.secondaryLight,
+              flex: 1,
+              flexDirection: 'row',
               alignItems: 'center',
-              justifyContent: 'center',
-              marginRight: 10
+              backgroundColor: themeMode === 'light' ? '#FFF9F0' : '#2D2319',
+              borderRadius: 14,
+              padding: 12,
+              borderWidth: 1,
+              borderColor: themeMode === 'light' ? '#F2DFCA' : '#423222',
+              ...makeShadow('0 2px 6px rgba(0,0,0,0.03)', '#000', 0.03, 2)
             }}
           >
-            <Feather name="bookmark" size={17} color={TOKENS.colors.primaryDark} />
+            <View
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 18,
+                backgroundColor: themeMode === 'light' ? '#FEEFD8' : '#3E3020',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginRight: 10
+              }}
+            >
+              <Feather name="sun" size={17} color="#D97706" />
+            </View>
+            <View style={{ flex: 1 }}>
+              <TextUI size={14} weight="bold" color={c.textPrimary}>
+                {t('أذكار الصباح', 'Morning')}
+              </TextUI>
+              <TextUI size={11} color={c.textSecondary}>
+                {toArabicNumber(27)} ذكراً
+              </TextUI>
+            </View>
+            <Feather name="chevron-left" size={15} color={c.textSecondary} />
+          </TouchableOpacity>
+
+          {/* Evening Azkar Quick Card */}
+          <TouchableOpacity
+            activeOpacity={0.82}
+            onPress={() => {
+              triggerHaptic?.('light');
+              const eveningCat = AZKAR_CATEGORIES.find((cat) => cat.id === 'evening') || AZKAR_CATEGORIES[1];
+              navigate('azkar_session', { category: eveningCat });
+            }}
+            style={{
+              flex: 1,
+              flexDirection: 'row',
+              alignItems: 'center',
+              backgroundColor: themeMode === 'light' ? '#F4F7FC' : '#1F2733',
+              borderRadius: 14,
+              padding: 12,
+              borderWidth: 1,
+              borderColor: themeMode === 'light' ? '#D6E2F5' : '#2B394E',
+              ...makeShadow('0 2px 6px rgba(0,0,0,0.03)', '#000', 0.03, 2)
+            }}
+          >
+            <View
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 18,
+                backgroundColor: themeMode === 'light' ? '#E0EDFE' : '#28364A',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginRight: 10
+              }}
+            >
+              <Feather name="moon" size={17} color="#3B82F6" />
+            </View>
+            <View style={{ flex: 1 }}>
+              <TextUI size={14} weight="bold" color={c.textPrimary}>
+                {t('أذكار المساء', 'Evening')}
+              </TextUI>
+              <TextUI size={11} color={c.textSecondary}>
+                {toArabicNumber(27)} ذكراً
+              </TextUI>
+            </View>
+            <Feather name="chevron-left" size={15} color={c.textSecondary} />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* 4. Blessed Friday Special Card (Shown on Fridays) */}
+      {(() => {
+        const isFriday = new Date().getDay() === 5;
+        if (!isFriday) return null;
+        return (
+          <TouchableOpacity
+            activeOpacity={0.88}
+            onPress={() => {
+              triggerHaptic?.('medium');
+              navigate('quran_reader', { surahId: 18, startPage: 293 });
+            }}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              backgroundColor: themeMode === 'light' ? '#F0FDF4' : '#142E1F',
+              borderRadius: 16,
+              padding: 14,
+              marginBottom: 16,
+              borderWidth: 1.5,
+              borderColor: '#22C55E',
+              ...makeShadow('0 4px 14px rgba(34, 197, 94, 0.15)', '#22C55E', 0.15, 6)
+            }}
+          >
+            <View
+              style={{
+                width: 42,
+                height: 42,
+                borderRadius: 21,
+                backgroundColor: themeMode === 'light' ? '#DCFCE7' : '#1D452E',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginRight: 12
+              }}
+            >
+              <Feather name="star" size={20} color="#16A34A" />
+            </View>
+            <View style={{ flex: 1 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <TextUI size={15} weight="bold" color={themeMode === 'light' ? '#15803D' : '#4ADE80'}>
+                  {t('يوم الجمعة المبارك 🕌', 'Blessed Friday')}
+                </TextUI>
+                <View style={{ backgroundColor: '#22C55E', paddingHorizontal: 6, paddingVertical: 1, borderRadius: 6 }}>
+                  <TextUI size={10} weight="bold" color="#FFFFFF">{t('سنة', 'Sunnah')}</TextUI>
+                </View>
+              </View>
+              <TextUI size={12} color={c.textSecondary} style={{ marginTop: 2 }}>
+                {t('قراءة سورة الكهف • الصلاة على النبي ﷺ • ساعة الإجابة', 'Surah Al-Kahf & Salawat')}
+              </TextUI>
+            </View>
+            <Feather name="chevron-left" size={18} color="#16A34A" />
+          </TouchableOpacity>
+        );
+      })()}
+
+      {/* 5. Islamic Features Bento Grid (Modern Elevated Islamic Layout) */}
+      <View style={{ marginBottom: 18 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+          <TextUI variant="h4" color={c.textPrimary}>
+            {t('الموسوعة والخدمات الإسلامية', 'Islamic Features & Services')}
+          </TextUI>
+          <TextUI variant="caption" color={c.textSecondary}>
+            {t('خدمات شاملة للمسلم', 'All Services')}
+          </TextUI>
+        </View>
+
+        {/* Bento Primary Hero Tile: Holy Quran */}
+        <TouchableOpacity
+          activeOpacity={0.88}
+          onPress={() => {
+            triggerHaptic?.('light');
+            if (readingBookmark) {
+              navigate('quran_reader', { surahId: readingBookmark.surahId, ayah: readingBookmark.ayah });
+            } else {
+              navigate('quran_index');
+            }
+          }}
+          style={{
+            backgroundColor: themeMode === 'light' ? '#FFFDF9' : '#2C221A',
+            borderRadius: 18,
+            padding: 16,
+            marginBottom: 10,
+            borderWidth: 1.5,
+            borderColor: TOKENS.colors.secondary,
+            ...makeShadow('0 4px 14px rgba(198, 146, 85, 0.12)', TOKENS.colors.secondary, 0.12, 5)
+          }}
+        >
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 }}>
+              <View
+                style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 24,
+                  backgroundColor: themeMode === 'light' ? '#FBF1E4' : '#3E3022',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderWidth: 1,
+                  borderColor: TOKENS.colors.secondary
+                }}
+              >
+                <Feather name="book-open" size={22} color={TOKENS.colors.primaryDark} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                  <TextUI size={16} weight="bold" color={c.textPrimary}>
+                    {t('المصحف الشريف المرتل', 'Holy Quran')}
+                  </TextUI>
+                  <View style={{ backgroundColor: themeMode === 'light' ? TOKENS.colors.primaryLight : '#3B2E24', paddingHorizontal: 7, paddingVertical: 2, borderRadius: 8 }}>
+                    <TextUI size={10} weight="bold" color={TOKENS.colors.primaryDark}>
+                      {readingBookmark ? t('متابعة', 'Resume') : t('١١٤ سورة', '114 Surahs')}
+                    </TextUI>
+                  </View>
+                </View>
+                <TextUI size={12} color={c.textSecondary} style={{ marginTop: 3 }} numberOfLines={1}>
+                  {readingBookmark
+                    ? `${t('آخر قراءة:', 'Last Read:')} سورة ${readingBookmark.surahName} • الآية ${toArabicNumber(readingBookmark.ayah)}`
+                    : t('قراءة بالخط العثماني، تفسير الآيات، وتلاوات مشاهير القرّاء', 'Uthmani Script, Tafsir, & Famous Reciters')}
+                </TextUI>
+              </View>
+            </View>
+            <Feather name="chevron-left" size={18} color={TOKENS.colors.primary} />
           </View>
-          <View style={{ flex: 1 }}>
-            <TextUI variant="caption" color={TOKENS.colors.primary}>
-              {t('متابعة القراءة من حيث توقفت', 'Continue Reading')}
-            </TextUI>
-            <TextUI variant="bodyBold" color={c.textPrimary}>
-              {readingBookmark.surahName} • الآية {readingBookmark.ayah}
-            </TextUI>
-          </View>
-          <Feather name="chevron-left" size={16} color={TOKENS.colors.primary} />
         </TouchableOpacity>
-      )}
 
-      {/* 5. Islamic Features Grid (Compact, Standard, Natural Proportions) */}
-      <View style={{ marginBottom: 16 }}>
-        <TextUI variant="h4" color={c.textPrimary} style={{ marginBottom: 10 }}>
-          {t('الموسوعة والخدمات الإسلامية', 'Islamic Features & Services')}
-        </TextUI>
-
+        {/* 2x2 Bento Tiles for Core Features */}
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, justifyContent: 'space-between' }}>
-          {quickFeatures.map((f) => (
+          {quickFeatures.filter((f) => f.id !== 'quran_index' && f.id !== 'azkar_categories').map((f) => (
             <TouchableOpacity
               key={f.id}
-              activeOpacity={0.75}
-              onPress={() => navigate(f.screen)}
+              activeOpacity={0.8}
+              onPress={() => {
+                triggerHaptic?.('light');
+                navigate(f.screen);
+              }}
               style={{
                 width: '48.5%',
                 backgroundColor: c.surface,
-                borderRadius: 12,
-                paddingVertical: 10,
+                borderRadius: 14,
+                paddingVertical: 12,
                 paddingHorizontal: 12,
                 flexDirection: 'row',
                 alignItems: 'center',
                 gap: 10,
                 borderWidth: 1,
                 borderColor: c.border,
-                ...makeShadow('0 1px 4px rgba(0,0,0,0.03)', '#000', 0.03, 2)
+                ...makeShadow('0 2px 6px rgba(0,0,0,0.02)', '#000', 0.02, 2)
               }}
             >
               <View
                 style={{
-                  width: 34,
-                  height: 34,
-                  borderRadius: 10,
-                  backgroundColor: themeMode === 'light' ? `${f.color}14` : `${f.color}28`,
+                  width: 38,
+                  height: 38,
+                  borderRadius: 12,
+                  backgroundColor: themeMode === 'light' ? `${f.color}15` : `${f.color}30`,
                   alignItems: 'center',
                   justifyContent: 'center'
                 }}
               >
-                <Feather name={f.icon as any} size={17} color={f.color} />
+                <Feather name={f.icon as any} size={18} color={f.color} />
               </View>
               <View style={{ flex: 1 }}>
-                <TextUI variant="bodyMedium" weight="medium" color={c.textPrimary} numberOfLines={1}>
+                <TextUI size={13} weight="bold" color={c.textPrimary} numberOfLines={1}>
                   {f.titleAr}
+                </TextUI>
+                <TextUI size={10.5} color={c.textSecondary} numberOfLines={1}>
+                  {f.titleEn}
                 </TextUI>
               </View>
             </TouchableOpacity>

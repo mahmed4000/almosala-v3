@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, ScrollView, TouchableOpacity, useWindowDimensions, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import * as Location from 'expo-location';
@@ -28,6 +28,15 @@ export const QiblaScreen: React.FC = () => {
 
   const isAligned = Math.abs(diff) <= 4;
   const relativeAngle = ((qiblaTarget - deviceHeading) % 360 + 360) % 360;
+
+  // Sensory haptic feedback on perfect Kaaba alignment
+  const wasAlignedRef = useRef(false);
+  useEffect(() => {
+    if (isAligned && !wasAlignedRef.current) {
+      triggerHaptic('success');
+    }
+    wasAlignedRef.current = isAligned;
+  }, [isAligned]);
 
   useEffect(() => {
     let headingSub: any = null;
@@ -182,12 +191,17 @@ export const QiblaScreen: React.FC = () => {
             height: compassDiameter,
             borderRadius: compassDiameter / 2,
             backgroundColor: c.surface,
-            borderWidth: 3,
+            borderWidth: 3.5,
             borderColor: isAligned ? '#4CAF50' : TOKENS.colors.secondary,
             alignItems: 'center',
             justifyContent: 'center',
             position: 'relative',
-            ...makeShadow('0 8px 30px rgba(0,0,0,0.08)', '#000', 0.08, 10)
+            ...makeShadow(
+              isAligned ? '0 8px 32px rgba(76, 175, 80, 0.45)' : '0 8px 30px rgba(0,0,0,0.08)',
+              isAligned ? '#4CAF50' : '#000',
+              isAligned ? 0.45 : 0.08,
+              12
+            )
           }}
         >
           {/* North Marker */}

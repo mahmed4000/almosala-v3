@@ -24,7 +24,7 @@ import { SettingsScreen } from '../screens/SettingsScreen';
 import { DownloadsScreen } from '../screens/DownloadsScreen';
 
 export const MainNavigator: React.FC = () => {
-  const { screen, navigate, theme, triggerHaptic } = useApp();
+  const { screen, navigate, theme, themeMode, triggerHaptic } = useApp();
   const c = theme;
 
   const renderCurrentScreen = () => {
@@ -119,19 +119,21 @@ export const MainNavigator: React.FC = () => {
               style={{
                 alignItems: 'center',
                 justifyContent: 'center',
-                paddingVertical: 2,
-                paddingHorizontal: 10
+                paddingVertical: 5,
+                paddingHorizontal: 14,
+                borderRadius: 14,
+                backgroundColor: isActive ? (themeMode === 'dark' ? '#332720' : '#F5ECE1') : 'transparent'
               }}
             >
               <Feather
                 name={item.icon}
-                size={19}
+                size={18}
                 color={isActive ? TOKENS.colors.primary : c.textSecondary}
               />
               <TextUI
                 variant="badge"
                 weight={isActive ? 'bold' : 'medium'}
-                color={isActive ? TOKENS.colors.primary : c.textSecondary}
+                color={isActive ? (themeMode === 'dark' ? '#E8DFD5' : TOKENS.colors.primaryDark) : c.textSecondary}
                 style={{ marginTop: 2 }}
               >
                 {item.labelAr}
